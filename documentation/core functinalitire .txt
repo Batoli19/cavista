@@ -1,0 +1,98 @@
+What your system will do (cleanly)
+A) Voice in + Voice out
+
+Voice command: you speak → it becomes text → Jarvis decides what to do.
+
+Voice response: Jarvis replies by speaking (text-to-speech), and shows the text on screen (for reliability).
+
+This gives the “Jarvis feel” even if the room is noisy.
+
+B) Project Management Core (the brain)
+
+Jarvis can:
+
+Create projects
+
+Capture project info (deadline, team size, goals, resources)
+
+Generate a plan (tasks + durations + order)
+
+Track execution:
+
+“mark task done”
+
+“delay task by 2 days”
+
+“show status”
+
+Recommend actions if off-track:
+
+reduce scope
+
+parallelize tasks
+
+add resources (even if it’s just a suggestion)
+
+Problem solved: people don’t know how to structure projects and they fall behind without realizing.
+
+C) Local Computer Actions (the hands)
+
+This is where you must be careful: OS automation can get messy. So you pick a small set of actions that are dependable.
+
+Reliable local actions for demo:
+
+✅ Minimize all windows (single command)
+
+✅ Open Notes (Notepad / OneNote)
+
+✅ Open Word / Excel
+
+✅ Open a specific folder / project workspace
+
+✅ Open a URL / open browser
+
+✅ Play/pause music (optional, depends on your setup)
+
+Problem solved: saves time, removes clicking around.
+
+D) “Edit locally” (Word/Excel) — what’s realistic
+
+There are two levels:
+
+Level 1 (Doable + reliable in a week)
+
+Jarvis can:
+
+open Word/Excel
+
+open a specific file (like project_plan.docx or budget.xlsx)
+
+generate the content (plan/budget/notes) and write it into the file
+
+save it locally
+
+That means: Jarvis “edits” documents by updating them and opening them.
+
+Level 2 (Harder, risky)
+
+Jarvis can:
+
+control Word/Excel like a human (click menus, type into cells live, format tables dynamically)
+
+This is possible but tends to break based on window focus, different Office versions, permissions.
+
+Recommendation for demo-proof: do Level 1.
+
+E) Git integration (nice-to-have)
+
+This is a separate plugin/module:
+
+“Jarvis, initialize git repo”
+
+“Commit with message …”
+
+“Push to GitHub”
+
+It’s doable if your team finishes MVP early and you have credentials ready.
+
+But it should not block your core demo.

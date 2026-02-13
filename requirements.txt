@@ -1,0 +1,6 @@
+﻿customtkinter
+SpeechRecognition
+pyttsx3
+python-docx
+openpyxl
+pyaudio
