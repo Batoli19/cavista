@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Forge - AI Project Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect x="4" y="4" width="10" height="10" fill="currentColor" opacity="0.9"/>
+                        <rect x="18" y="4" width="10" height="10" fill="currentColor" opacity="0.6"/>
+                        <rect x="4" y="18" width="10" height="10" fill="currentColor" opacity="0.6"/>
+                        <rect x="18" y="18" width="10" height="10" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                    <h1>Project<span>Forge</span></h1>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <button class="new-project-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    New Project
+                </button>
+
+                <div class="projects-section">
+                    <h3 class="section-title">Recent Projects</h3>
+                    <div class="project-list">
+                        <div class="project-item active">
+                            <div class="project-icon">📱</div>
+                            <div class="project-info">
+                                <div class="project-name">Mobile App Redesign</div>
+                                <div class="project-date">Today, 2:34 PM</div>
+                            </div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-icon">🌐</div>
+                            <div class="project-info">
+                                <div class="project-name">E-commerce Platform</div>
+                                <div class="project-date">Yesterday</div>
+                            </div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-icon">🎨</div>
+                            <div class="project-info">
+                                <div class="project-name">Brand Identity System</div>
+                                <div class="project-date">3 days ago</div>
+                            </div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-icon">📊</div>
+                            <div class="project-info">
+                                <div class="project-name">Analytics Dashboard</div>
+                                <div class="project-date">Last week</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="auth-section">
+                    <button class="auth-btn signin-btn">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M9 9C11.0711 9 12.75 7.32107 12.75 5.25C12.75 3.17893 11.0711 1.5 9 1.5C6.92893 1.5 5.25 3.17893 5.25 5.25C5.25 7.32107 6.92893 9 9 9Z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M15.75 16.5C15.75 13.6005 12.7279 11.25 9 11.25C5.27208 11.25 2.25 13.6005 2.25 16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        Sign In
+                    </button>
+                    <button class="auth-btn signup-btn">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M9 9C11.0711 9 12.75 7.32107 12.75 5.25C12.75 3.17893 11.0711 1.5 9 1.5C6.92893 1.5 5.25 3.17893 5.25 5.25C5.25 7.32107 6.92893 9 9 9Z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M15.75 16.5C15.75 13.6005 12.7279 11.25 9 11.25C5.27208 11.25 2.25 13.6005 2.25 16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M14.25 4.5V7.5M12.75 6H15.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="chat-container">
+                <div class="messages-area" id="messagesArea">
+                    <!-- Welcome Message -->
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect x="8" y="8" width="14" height="14" fill="currentColor" opacity="0.9"/>
+                                <rect x="26" y="8" width="14" height="14" fill="currentColor" opacity="0.6"/>
+                                <rect x="8" y="26" width="14" height="14" fill="currentColor" opacity="0.6"/>
+                                <rect x="26" y="26" width="14" height="14" fill="currentColor" opacity="0.3"/>
+                            </svg>
+                        </div>
+                        <h2>Welcome to ProjectForge</h2>
+                        <p>Share your project idea and I'll help you plan, structure, and bring it to life. Upload images, documents, or use voice to get started.</p>
+                        
+                        <div class="quick-actions">
+                            <button class="quick-action-card">
+                                <div class="qa-icon">💡</div>
+                                <div class="qa-title">Start from scratch</div>
+                                <div class="qa-desc">I have a new project idea</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="qa-icon">📋</div>
+                                <div class="qa-title">Upload documents</div>
+                                <div class="qa-desc">I have project requirements</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="qa-icon">🎯</div>
+                                <div class="qa-title">Improve existing</div>
+                                <div class="qa-desc">Optimize my current project</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Example Messages (hidden by default, shown after interaction) -->
+                    <!-- User Message Example -->
+                    <!-- <div class="message user-message">
+                        <div class="message-content">
+                            <p>I want to build a mobile app for fitness tracking</p>
+                        </div>
+                        <div class="message-avatar">You</div>
+                    </div> -->
+
+                    <!-- AI Message Example -->
+                    <!-- <div class="message ai-message">
+                        <div class="message-avatar">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect x="4" y="4" width="7" height="7" fill="currentColor" opacity="0.9"/>
+                                <rect x="13" y="4" width="7" height="7" fill="currentColor" opacity="0.6"/>
+                                <rect x="4" y="13" width="7" height="7" fill="currentColor" opacity="0.6"/>
+                                <rect x="13" y="13" width="7" height="7" fill="currentColor" opacity="0.3"/>
+                            </svg>
+                        </div>
+                        <div class="message-content">
+                            <p>Great! A fitness tracking app. Let me help you plan this project...</p>
+                        </div>
+                    </div> -->
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <div class="attachments-preview" id="attachmentsPreview"></div>
+                    
+                    <div class="input-wrapper">
+                        <div class="input-actions-left">
+                            <button class="action-btn" id="imageUploadBtn" title="Upload Image">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <rect x="2" y="4" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="7" cy="8.5" r="1.5" fill="currentColor"/>
+                                    <path d="M2 13L6 9L10 13M10 13L12 11L18 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <input type="file" id="imageInput" accept="image/*" multiple hidden>
+                            
+                            <button class="action-btn" id="fileUploadBtn" title="Upload File">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M10 14V6M10 6L7 9M10 6L13 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3 14V15C3 16.1046 3.89543 17 5 17H15C16.1046 17 17 16.1046 17 15V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" multiple hidden>
+                        </div>
+
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Describe your project idea or ask a question..."
+                            rows="1"
+                        ></textarea>
+
+                        <div class="input-actions-right">
+                            <button class="action-btn voice-btn" id="voiceBtn" title="Voice Input">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="mic-icon">
+                                    <rect x="8" y="2" width="4" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M5 10C5 12.7614 7.23858 15 10 15C12.7614 15 15 12.7614 15 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M10 15V18M7 18H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="stop-icon" style="display: none;">
+                                    <rect x="6" y="6" width="8" height="8" rx="1" fill="currentColor"/>
+                                </svg>
+                            </button>
+
+                            <button class="send-btn" id="sendBtn" disabled>
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-footer">
+                        <span class="footer-text">ProjectForge can make mistakes. Consider verifying important information.</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
