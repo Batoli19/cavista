@@ -1,4 +1,573 @@
-﻿{
-  "active_project_id": null,
-  "projects": []
+{
+  "active_project_id": "714d01e2",
+  "projects": [
+    {
+      "id": "2e8004c1",
+      "name": "Test Project",
+      "description": "A simple test project",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "9a42d00b",
+      "name": "hackathon",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "67a86371",
+      "name": "Create Project Hackathon.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "cb6367c1",
+      "name": "Create Project Hackathon.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "cf6fcee1",
+      "name": "Create project name.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "56977e04",
+      "name": "Create Project Hackathon.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "b6fd3d60",
+      "name": "Create project 0.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "6f145f00",
+      "name": "Create project 1.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "9ae7b39b",
+      "name": "Dessert.",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "57596636",
+      "name": "Untitled Project",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "28ae5d41",
+      "name": "Z",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "ed3b454a",
+      "name": "Zero",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    },
+    {
+      "id": "b839261d",
+      "name": "Zero",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "1094355a",
+      "name": "Builder Ketchup",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "714d01e2",
+      "name": "Create",
+      "description": "",
+      "deadline": null,
+      "created_at": "2026-02-17",
+      "tasks": []
+    }
+  ]
 }

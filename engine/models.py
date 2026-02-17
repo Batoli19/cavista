@@ -10,6 +10,9 @@ class Task:
     depends_on: List[str] = field(default_factory=list)
     status: str = "pending"  # pending | done
     delay_days: int = 0
+    description: str = ""
+    priority: str = "medium"  # low, medium, high
+    role: str = "general"
 
 @dataclass
 class Project:
