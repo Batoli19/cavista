@@ -1,11 +1,13 @@
 ﻿import uuid
 from datetime import date, timedelta
 from typing import Dict, Any, List, Tuple
-from .models import Project, Task
+
 from .storage import load_data, save_data
+
 
 def _today_iso() -> str:
     return date.today().isoformat()
+
 
 def create_project(name: str, deadline_iso: str | None = None, description: str = "") -> Dict[str, Any]:
     data = load_data()
@@ -23,6 +25,7 @@ def create_project(name: str, deadline_iso: str | None = None, description: str 
     save_data(data)
     return project
 
+
 def get_active_project() -> Dict[str, Any] | None:
     data = load_data()
     pid = data.get("active_project_id")
@@ -30,6 +33,7 @@ def get_active_project() -> Dict[str, Any] | None:
         if p.get("id") == pid:
             return p
     return None
+
 
 def set_active_project(project_id: str) -> Dict[str, Any] | None:
     data = load_data()
@@ -40,16 +44,44 @@ def set_active_project(project_id: str) -> Dict[str, Any] | None:
             return p
     return None
 
+
+def generate_plan(project: Dict[str, Any], use_ai: bool = True, team_size: int = 1) -> List[Dict[str, Any]]:
+    """
+    Generate tasks using AI if enabled + configured, otherwise fallback to a basic plan.
+    """
+    tasks: List[Dict[str, Any]] = []
+
+    if use_ai:
+        try:
+            # Import here to avoid circular imports / missing module issues
+            from .ai_planner import generate_plan_ai
+
+            tasks = generate_plan_ai(
+                project_name=project.get("name", "Untitled Project"),
+                description=project.get("description", ""),
+                team_size=team_size
+            )
+        except Exception as e:
+            print(f"[engine] AI planner failed, using fallback. Error: {e}")
+            tasks = []
+
+    # If AI not configured or returned empty -> fallback
+    if not tasks:
+        tasks = generate_plan_basic(project)
+
+    return tasks
+
+
 def generate_plan_basic(project: Dict[str, Any]) -> List[Dict[str, Any]]:
     # Simple, demo-proof default plan (replace later with AI)
-    tasks = [
+    return [
         {"id": "t1", "name": "Scope & Requirements", "duration_days": 1, "depends_on": [], "status": "pending", "delay_days": 0},
         {"id": "t2", "name": "UI / Design", "duration_days": 1, "depends_on": ["t1"], "status": "pending", "delay_days": 0},
         {"id": "t3", "name": "Core Build (Engine + UI)", "duration_days": 2, "depends_on": ["t2"], "status": "pending", "delay_days": 0},
         {"id": "t4", "name": "Integrations (Voice + Actions)", "duration_days": 1, "depends_on": ["t3"], "status": "pending", "delay_days": 0},
         {"id": "t5", "name": "Testing & Demo Prep", "duration_days": 1, "depends_on": ["t4"], "status": "pending", "delay_days": 0},
     ]
-    return tasks
+
 
 def save_tasks(project_id: str, tasks: List[Dict[str, Any]]) -> Dict[str, Any] | None:
     data = load_data()
@@ -59,6 +91,7 @@ def save_tasks(project_id: str, tasks: List[Dict[str, Any]]) -> Dict[str, Any] |
             save_data(data)
             return p
     return None
+
 
 def mark_task_done(task_id: str) -> Tuple[bool, str]:
     data = load_data()
@@ -72,6 +105,7 @@ def mark_task_done(task_id: str) -> Tuple[bool, str]:
                     return True, f"Marked {task_id} as done."
     return False, "Task not found."
 
+
 def delay_task(task_id: str, days: int) -> Tuple[bool, str]:
     data = load_data()
     pid = data.get("active_project_id")
@@ -84,15 +118,17 @@ def delay_task(task_id: str, days: int) -> Tuple[bool, str]:
                     return True, f"Delayed {task_id} by {days} day(s)."
     return False, "Task not found."
 
+
 def compute_schedule(project: Dict[str, Any]) -> List[Dict[str, Any]]:
     # Simple dependency scheduling: assumes task list already topologically ordered
     start = date.today()
-    schedule = []
-    end_dates = {}
+    schedule: List[Dict[str, Any]] = []
+    end_dates: Dict[str, date] = {}
 
     for t in project.get("tasks", []):
         deps = t.get("depends_on", [])
         base_start = start
+
         for d in deps:
             if d in end_dates:
                 base_start = max(base_start, end_dates[d] + timedelta(days=1))
@@ -105,6 +141,7 @@ def compute_schedule(project: Dict[str, Any]) -> List[Dict[str, Any]]:
         schedule.append({**t, "start": task_start.isoformat(), "end": task_end.isoformat()})
 
     return schedule
+
 
 def get_status(project: Dict[str, Any]) -> Dict[str, Any]:
     schedule = compute_schedule(project)
@@ -119,4 +156,52 @@ def get_status(project: Dict[str, Any]) -> Dict[str, Any]:
 
     if final_end <= deadline:
         return {"status": "on-track", "message": f"On track. Estimated finish {final_end} before deadline {deadline}.", "schedule": schedule}
+
     return {"status": "off-track", "message": f"Off track. Estimated finish {final_end} after deadline {deadline}.", "schedule": schedule}
+def get_project_diagnosis(project_id: str) -> List[str]:
+    """
+    Simple 'doctor' diagnostics for a project.
+    Returns a list of issues/warnings. Empty list means healthy.
+    """
+    data = load_data()
+    project = None
+    for p in data.get("projects", []):
+        if p.get("id") == project_id:
+            project = p
+            break
+
+    if not project:
+        return ["Project not found."]
+
+    issues: List[str] = []
+    tasks = project.get("tasks", [])
+
+    if not tasks:
+        issues.append("No tasks generated yet. Say 'Generate plan' to create tasks.")
+        return issues
+
+    # Check duplicate task IDs
+    ids = [t.get("id") for t in tasks if t.get("id")]
+    if len(ids) != len(set(ids)):
+        issues.append("Duplicate task IDs found (some tasks share the same id).")
+
+    # Check missing dependencies
+    id_set = set(ids)
+    for t in tasks:
+        for dep in t.get("depends_on", []) or []:
+            if dep not in id_set:
+                issues.append(f"Task {t.get('id')} depends on missing task '{dep}'.")
+
+    # Check tasks missing required fields
+    for t in tasks:
+        if not t.get("name"):
+            issues.append(f"Task {t.get('id')} is missing a name.")
+        if "duration_days" not in t:
+            issues.append(f"Task {t.get('id')} is missing duration_days.")
+
+    # Check deadline feasibility
+    status = get_status(project)
+    if status.get("status") == "off-track":
+        issues.append(status.get("message", "Project is off track."))
+
+    return issues
