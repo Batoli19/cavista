@@ -1,3 +1,13 @@
+// Update clock in connection bar
+function updateClockText() {
+    const n = new Date();
+    const t = n.toTimeString().slice(0, 8);
+    const el = document.getElementById('clockText');
+    if (el) el.textContent = t;
+}
+setInterval(updateClockText, 1000);
+updateClockText();
+
 // DOM Elements
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -12,13 +22,13 @@ const newProjectBtn = document.querySelector('.new-project-btn');
 const quickActionCards = document.querySelectorAll('.quick-action-card');
 
 // State
+// State
 let isRecording = false;
-let mediaRecorder = null;
-let audioChunks = [];
+let recognition = null;
 let attachedFiles = [];
 
 // Auto-resize textarea
-messageInput.addEventListener('input', function() {
+messageInput.addEventListener('input', function () {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
     toggleSendButton();
@@ -41,52 +51,87 @@ messageInput.addEventListener('keydown', (e) => {
     }
 });
 
-function sendMessage() {
+async function sendMessage() {
     const text = messageInput.value.trim();
-    
+
     if (text === '' && attachedFiles.length === 0) return;
-    
+
     // Hide welcome message if visible
     const welcomeMessage = document.querySelector('.welcome-message');
     if (welcomeMessage) {
         welcomeMessage.style.animation = 'fadeOut 0.3s ease forwards';
         setTimeout(() => welcomeMessage.remove(), 300);
     }
-    
+
     // Create user message
     const userMessageDiv = createUserMessage(text, attachedFiles);
     messagesArea.appendChild(userMessageDiv);
-    
-    // Clear input and attachments
+
+    // Prepare payload
+    const originalText = text;
+    const filesToSend = await Promise.all(attachedFiles.map(file => convertToBase64(file)));
+
+    // Clear input
     messageInput.value = '';
     messageInput.style.height = 'auto';
     attachedFiles = [];
     updateAttachmentsPreview();
     toggleSendButton();
-    
-    // Scroll to bottom
     scrollToBottom();
-    
-    // Simulate AI response (you'll replace this with Python backend)
-    setTimeout(() => {
-        const aiResponse = generateMockAIResponse(text);
+
+    // Call Python Backend
+    try {
+        const response = await fetch('/api/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                command: originalText,
+                files: filesToSend
+            })
+        });
+        const data = await response.json();
+        const aiResponse = data.reply;
+
         const aiMessageDiv = createAIMessage(aiResponse);
         messagesArea.appendChild(aiMessageDiv);
         scrollToBottom();
-    }, 1000);
+
+        // Speak response
+        speak(aiResponse);
+
+    } catch (err) {
+        console.error(err);
+        const errorDiv = createAIMessage("Error: Could not connect to Jarvis backend. Is server.py running?");
+        messagesArea.appendChild(errorDiv);
+        scrollToBottom();
+    }
+}
+
+// Helper: Convert file to Base64
+function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve({
+            name: file.name,
+            type: file.type,
+            content: reader.result.split(',')[1] // Remove 'data:*/*;base64,' prefix
+        });
+        reader.onerror = error => reject(error);
+    });
 }
 
 function createUserMessage(text, files) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message user-message';
-    
+
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.textContent = 'You';
-    
+
     const content = document.createElement('div');
     content.className = 'message-content';
-    
+
     // Add file previews if any
     if (files.length > 0) {
         const filesDiv = document.createElement('div');
@@ -99,23 +144,23 @@ function createUserMessage(text, files) {
         });
         content.appendChild(filesDiv);
     }
-    
+
     if (text) {
         const textP = document.createElement('p');
         textP.textContent = text;
         content.appendChild(textP);
     }
-    
+
     messageDiv.appendChild(content);
     messageDiv.appendChild(avatar);
-    
+
     return messageDiv;
 }
 
 function createAIMessage(text) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ai-message';
-    
+
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.innerHTML = `
@@ -126,17 +171,17 @@ function createAIMessage(text) {
             <rect x="13" y="13" width="7" height="7" fill="currentColor" opacity="0.3"/>
         </svg>
     `;
-    
+
     const content = document.createElement('div');
     content.className = 'message-content';
-    
+
     const textP = document.createElement('p');
     textP.textContent = text;
     content.appendChild(textP);
-    
+
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
-    
+
     return messageDiv;
 }
 
@@ -159,47 +204,80 @@ function scrollToBottom() {
 // Voice Recording
 voiceBtn.addEventListener('click', toggleRecording);
 
-async function toggleRecording() {
+function toggleRecording() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Your browser does not support Web Speech API. Please use Chrome or Edge.");
+        return;
+    }
+
     if (!isRecording) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-            
-            mediaRecorder.ondataavailable = (event) => {
-                audioChunks.push(event.data);
-            };
-            
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                // Here you would send audioBlob to your Python backend for transcription
-                // For now, we'll just add a placeholder
-                addAudioAttachment(audioBlob);
-                
-                // Stop all tracks
-                stream.getTracks().forEach(track => track.stop());
-            };
-            
-            mediaRecorder.start();
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
             isRecording = true;
             voiceBtn.classList.add('recording');
-            
-        } catch (error) {
-            console.error('Error accessing microphone:', error);
-            alert('Could not access microphone. Please check your permissions.');
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log('Recognized:', transcript);
+            messageInput.value = transcript;
+            toggleSendButton();
+            sendMessage(); // Auto-send on voice
+        };
+
+        recognition.onspeechend = () => {
+            recognition.stop();
+        };
+
+        recognition.onend = () => {
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+
+            let msg = "Speech recognition error: " + event.error;
+            if (event.error === 'not-allowed') {
+                msg = "Microphone access denied. Please allow microphone permissions in your browser settings.";
+            } else if (event.error === 'service-not-allowed') {
+                msg = "Speech service not allowed. Ensure you have internet connection (Chrome uses Google servers).";
+            }
+            alert(msg);
+        };
+
+        try {
+            recognition.start();
+            console.log("Recognition started");
+        } catch (e) {
+            console.error("Start error:", e);
+            alert("Could not start recognition: " + e.message);
         }
     } else {
-        mediaRecorder.stop();
-        isRecording = false;
-        voiceBtn.classList.remove('recording');
+        if (recognition) recognition.stop();
     }
 }
 
-function addAudioAttachment(audioBlob) {
-    const file = new File([audioBlob], `voice-${Date.now()}.wav`, { type: 'audio/wav' });
-    attachedFiles.push(file);
-    updateAttachmentsPreview();
-    toggleSendButton();
+// Text to Speech
+function speak(text) {
+    if ('speechSynthesis' in window) {
+        // Cancel any previous speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        // Optional: Select a voice
+        // const voices = window.speechSynthesis.getVoices();
+        // utterance.voice = voices.find(v => v.lang === 'en-US') || voices[0];
+
+        window.speechSynthesis.speak(utterance);
+    }
 }
 
 // Image Upload
@@ -233,11 +311,11 @@ function handleFileUpload(e) {
 // Update Attachments Preview
 function updateAttachmentsPreview() {
     attachmentsPreview.innerHTML = '';
-    
+
     attachedFiles.forEach((file, index) => {
         const attachmentItem = document.createElement('div');
         attachmentItem.className = 'attachment-item';
-        
+
         if (file.type.startsWith('image/')) {
             const img = document.createElement('img');
             img.src = URL.createObjectURL(file);
@@ -247,17 +325,17 @@ function updateAttachmentsPreview() {
             icon.textContent = '📄';
             attachmentItem.appendChild(icon);
         }
-        
+
         const fileName = document.createElement('span');
         fileName.textContent = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
         attachmentItem.appendChild(fileName);
-        
+
         const removeBtn = document.createElement('span');
         removeBtn.className = 'attachment-remove';
         removeBtn.innerHTML = '✕';
         removeBtn.onclick = () => removeAttachment(index);
         attachmentItem.appendChild(removeBtn);
-        
+
         attachmentsPreview.appendChild(attachmentItem);
     });
 }
@@ -303,7 +381,7 @@ newProjectBtn.addEventListener('click', () => {
             </div>
         </div>
     `;
-    
+
     // Re-attach event listeners to new quick action cards
     attachQuickActionListeners();
 });
@@ -312,7 +390,7 @@ newProjectBtn.addEventListener('click', () => {
 function attachQuickActionListeners() {
     const cards = document.querySelectorAll('.quick-action-card');
     cards.forEach(card => {
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function () {
             const title = this.querySelector('.qa-title').textContent;
             const prompts = {
                 'Start from scratch': 'I have a new project idea and need help planning it from the ground up.',
@@ -330,10 +408,10 @@ attachQuickActionListeners();
 
 // Project Item Click
 document.querySelectorAll('.project-item').forEach(item => {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function () {
         document.querySelectorAll('.project-item').forEach(i => i.classList.remove('active'));
         this.classList.add('active');
-        
+
         // Here you would load the project conversation from your Python backend
         // For now, we'll just clear and show welcome
         const projectName = this.querySelector('.project-name').textContent;
@@ -383,4 +461,43 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+
+// Right-panel quick commands
+document.querySelectorAll('.rp-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const cmd = btn.getAttribute('data-cmd') || btn.textContent.trim();
+        messageInput.value = cmd;
+        // Trigger input event to resize textarea and enable send button
+        messageInput.dispatchEvent(new Event('input'));
+        // Optional: Auto-send
+        // await sendMessage();
+        messageInput.focus();
+    });
+});
+
+// Update connection status in right panel
+function updateRightPanelStatus(isOnline) {
+    const connDot = document.getElementById('connDot');
+    const connText = document.getElementById('connText');
+    if (connDot && connText) {
+        if (isOnline) {
+            connDot.classList.remove('offline');
+            connDot.classList.add('online');
+            connText.textContent = 'Online';
+        } else {
+            connDot.classList.remove('online');
+            connDot.classList.add('offline');
+            connText.textContent = 'Offline';
+        }
+    }
+}
+
+// Hook into existing setConnected function
+const originalSetConnected = setConnected;
+setConnected = function (isOnline) {
+    originalSetConnected(isOnline); // Call original
+    updateRightPanelStatus(isOnline); // Update right panel
+};
+
 console.log('ProjectForge initialized successfully! Ready for Python backend integration.');
+

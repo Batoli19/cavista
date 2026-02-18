@@ -1,8 +1,7 @@
-# Python virtual environment
-.venv/
-venv/
-env/
-
-# Python cache
+.env
+*.env
 __pycache__/
 *.pyc
+.venv/
+venv/
+procs.txt

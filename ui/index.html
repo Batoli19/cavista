@@ -92,7 +92,15 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="chat-container">
-                <div class="messages-area" id="messagesArea">
+                
+                <div class="connection-bar">
+                    <div class="connection-left">
+                        <span class="connection-dot" id="connectionDot"></span>
+                        <span class="connection-text" id="statusText">Connecting…</span>
+                    </div>
+                    <div class="connection-right" id="clockText">--:--:--</div>
+                </div>
+<div class="messages-area" id="messagesArea">
                     <!-- Welcome Message -->
                     <div class="welcome-message">
                         <div class="welcome-icon">
