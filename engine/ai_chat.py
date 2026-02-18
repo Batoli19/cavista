@@ -1,4 +1,3 @@
-
 import json
 import os
 import urllib.request
@@ -12,14 +11,33 @@ import io
 import zipfile
 import xml.etree.ElementTree as ET
 
-# Configuration
+# ══════════════════════════════════════════════════════════════════════════════
+#  CONFIGURATION — Groq first, Gemini only for vision
+# ══════════════════════════════════════════════════════════════════════════════
+
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
-# Defaults
-DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini").lower()
-GEMINI_MODEL = os.environ.get("LLM_MODEL_NAME", "gemini-2.5-flash")
-GROQ_MODEL = os.environ.get("GROQ_MODEL_NAME", "llama-3.3-70b-versatile")
+# Models
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  HELPER: Check if files contain images
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _has_images(files: List[Dict[str, Any]]) -> bool:
+    """Check if any file is an image."""
+    if not files:
+        return False
+    for file in files:
+        mime = file.get("type", "").lower()
+        name = file.get("name", "").lower()
+        if mime.startswith("image/") or name.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp')):
+            return True
+    return False
+
 
 def _extract_text_from_file(base64_data: str, mime_type: str, filename: str) -> str:
     """
@@ -29,34 +47,30 @@ def _extract_text_from_file(base64_data: str, mime_type: str, filename: str) -> 
     try:
         file_bytes = base64.b64decode(base64_data)
         
-        # 1. DOCX Handling (Zip of XMLs)
+        # 1. DOCX Handling
         if "wordprocessingml.document" in mime_type or filename.endswith(".docx"):
             try:
                 with io.BytesIO(file_bytes) as f:
                     with zipfile.ZipFile(f) as z:
                         xml_content = z.read("word/document.xml")
                         tree = ET.fromstring(xml_content)
-                        # Namespace for word processing ml
                         ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
                         text_parts = []
                         for node in tree.iter():
-                            if node.tag == f"{{{ns['w']}}}t": # Text node
+                            if node.tag == f"{{{ns['w']}}}t":
                                 if node.text:
                                     text_parts.append(node.text)
-                            elif node.tag == f"{{{ns['w']}}}p": # Paragraph (add newline)
+                            elif node.tag == f"{{{ns['w']}}}p":
                                 text_parts.append("\n")
                         return "".join(text_parts).strip()
             except Exception as e:
                 print(f"[Text Extraction] Failed to parse DOCX: {e}")
                 return None
 
-        # 2. Plain Text / Code Handling
-        # Try to decode as UTF-8
+        # 2. Plain Text / Code
         try:
             return file_bytes.decode('utf-8')
         except UnicodeDecodeError:
-            # If standard utf-8 fails, it might be binary or other encoding. 
-            # For now, we only support utf-8 text.
             print(f"[Text Extraction] Could not decode file as UTF-8: {mime_type}")
             return None
 
@@ -65,47 +79,81 @@ def _extract_text_from_file(base64_data: str, mime_type: str, filename: str) -> 
         return None
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  MAIN ENTRY POINT — Smart routing
+# ══════════════════════════════════════════════════════════════════════════════
+
 def chat_with_ai(message: str, files: List[Dict[str, Any]] = None) -> str:
     """
-    Sends a message to the AI. Smartly routes between Gemini and Groq.
-    - Files present? -> Gemini (Multimodal)
-    - Groq configured? -> Try Groq first, fallback to Gemini on error.
-    - Default -> Gemini.
+    Smart AI router:
+    - Has images? → Gemini vision (ONLY path that uses Gemini)
+    - Text only? → Groq (FAST, unlimited, DEFAULT)
+    
+    This is the NEW optimized version — Groq first, not Gemini.
     """
     if not message and not files:
         return "I'm listening..."
 
-    # 1. Force Gemini if files are present (Groq text models don't support images easily via this method)
-    if files and len(files) > 0:
-        return _chat_with_gemini(message, files)
+    files = files or []
 
-    # 2. Check Provider Preference
-    provider = DEFAULT_PROVIDER
+    # ── VISION PATH: Images detected → use Gemini ────────────────────────
+    if _has_images(files):
+        print("[AI Chat] 🖼️  Images detected → routing to Gemini vision")
+        return _chat_with_gemini_vision(message, files)
+
+    # ── TEXT PATH: Default to Groq (FAST) ────────────────────────────────
+    print("[AI Chat] 💬 Text only → routing to Groq (fast)")
     
-    # Logic: If Groq is requested, try it. If it fails, fallback to Gemini.
-    if provider == "groq":
-        if not GROQ_API_KEY:
-            return "Groq API Key missing. Please set GROQ_API_KEY or switch provider to 'gemini'."
+    # Extract text from non-image files and append to message
+    if files:
+        text_content = []
+        for file in files:
+            mime = file.get("type", "")
+            name = file.get("name", "unknown")
+            b64_data = file.get("content", "")
+            
+            extracted = _extract_text_from_file(b64_data, mime, name)
+            if extracted:
+                text_content.append(f"\n--- File: {name} ---\n{extracted}\n--- End of {name} ---\n")
         
+        if text_content:
+            message += "\n\n" + "".join(text_content)
+    
+    # Try Groq first
+    if GROQ_API_KEY:
         try:
             return _chat_with_groq(message)
         except Exception as e:
-            print(f"[AI Chat] Groq failed: {e}. Falling back to Gemini.")
-            return _chat_with_gemini(message, files) # Fallback
+            print(f"[AI Chat] Groq failed: {e}")
+            # Fallback to Gemini if Groq fails
+            if GEMINI_API_KEY:
+                print("[AI Chat] Falling back to Gemini (text only)")
+                return _chat_with_gemini_text(message)
+            return f"AI error: {e}"
+    
+    # No Groq key? Try Gemini
+    if GEMINI_API_KEY:
+        print("[AI Chat] No Groq key, using Gemini (text only)")
+        return _chat_with_gemini_text(message)
+    
+    return "No AI configured. Please set GROQ_API_KEY or GEMINI_API_KEY."
 
-    # 3. Default to Gemini
-    return _chat_with_gemini(message, files)
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  GROQ — Fast, unlimited, text-only (DEFAULT)
+# ══════════════════════════════════════════════════════════════════════════════
 
 def _chat_with_groq(message: str) -> str:
     """
-    Interacts with Groq API using urllib (standard library).
+    Groq API — fast, unlimited free tier, text only.
+    This is the DEFAULT path for all text queries.
     """
     url = "https://api.groq.com/openai/v1/chat/completions"
     
     payload = {
         "model": GROQ_MODEL,
         "messages": [
-            {"role": "system", "content": "You are a helpful, witty, and concise assistant."},
+            {"role": "system", "content": "You are JARVIS, a helpful and witty AI assistant."},
             {"role": "user", "content": message}
         ],
         "temperature": 0.7,
@@ -120,145 +168,134 @@ def _chat_with_groq(message: str) -> str:
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {GROQ_API_KEY}",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" 
+            "User-Agent": "JARVIS/1.0"
         }
     )
     
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=15) as response:
             resp_body = response.read().decode("utf-8")
             resp_data = json.loads(resp_body)
-            return resp_data["choices"][0]["message"]["content"]
+            return resp_data["choices"][0]["message"]["content"].strip()
             
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
-        raise Exception(f"HTTP {e.code} - {error_body}")
+        raise Exception(f"Groq HTTP {e.code}: {error_body}")
+    except Exception as e:
+        raise Exception(f"Groq error: {e}")
 
 
-def _chat_with_gemini(message: str, files: List[Dict[str, Any]] = None) -> str:
+# ══════════════════════════════════════════════════════════════════════════════
+#  GEMINI — Only for vision (images) or fallback
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _chat_with_gemini_vision(message: str, files: List[Dict[str, Any]]) -> str:
     """
-    Interacts with Google Gemini API with Retry Logic and Model Fallback.
+    Gemini vision — ONLY for image analysis.
+    Single attempt, no retry loops (to avoid rate limit cascades).
     """
     if not GEMINI_API_KEY:
-        return "I'm not connected to my primary brain (Gemini API Key missing)."
+        return "Vision unavailable (no GEMINI_API_KEY). Please add images via upload."
 
-    # Define fallback models in order of preference
-    # 1. User configured model (current default)
-    # 2. Flash Lite (Fastest, cheapest)
-    # 3. Flash 2.0 (Standard)
-    # 4. Flash 2.5 (Newer)
-    
-    current_model = GEMINI_MODEL if "gemini" in GEMINI_MODEL else "gemini-2.0-flash"
-    fallback_models = [
-        "gemini-2.0-flash-lite-001",
-        "gemini-2.0-flash",
-        "gemini-2.5-flash" 
-    ]
-    
-    # Construct distinct list of models to try
-    models_to_try = [current_model]
-    for m in fallback_models:
-        if m != current_model and m not in models_to_try:
-            models_to_try.append(m)
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
 
-    max_retries_per_model = 1
-    base_delay = 2
+        parts = []
+        if message:
+            parts.append({"text": message})
 
-    all_errors = []
-
-    for model in models_to_try:
-        print(f"[Gemini] Attempting with model: {model}")
-        
-        for attempt in range(max_retries_per_model + 1):
-            try:
-                # Construct Gemini API URL
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
-
-                parts = []
-                if message:
-                    parts.append({"text": message})
-
-                if files:
-                    for file in files:
-                        mime_type = file.get("type", "application/octet-stream")
-                        base64_data = file.get("content", "")
-                        
-                        # Check for supported inline types
-                        if mime_type.startswith("image/") or mime_type.startswith("audio/") or mime_type == "application/pdf":
-                            parts.append({
-                                "inline_data": {
-                                    "mime_type": mime_type,
-                                    "data": base64_data
-                                }
-                            })
-                        else:
-                            # Attempt to extract text for other types (docx, txt, json, code)
-                            extracted_text = _extract_text_from_file(base64_data, mime_type, file.get("name", ""))
-                            if extracted_text:
-                                # Append extracted text to the message parts
-                                parts.append({"text": f"\n\n[Content of file '{file.get('name', 'unknown')}':]\n{extracted_text}\n[End of file]\n"})
-                            else:
-                                # Fallback or skip
-                                 print(f"[Gemini] Skipping unsupported file type: {mime_type}")
-
-                payload = {"contents": [{"parts": parts}]}
-                data_json = json.dumps(payload).encode("utf-8")
-
-                req = urllib.request.Request(
-                    url, 
-                    data=data_json, 
-                    headers={"Content-Type": "application/json"}
-                )
-
-                with urllib.request.urlopen(req) as response:
-                    resp_body = response.read().decode("utf-8")
-                    resp_data = json.loads(resp_body)
-                    try:
-                        return resp_data["candidates"][0]["content"]["parts"][0]["text"]
-                    except (KeyError, IndexError):
-                        return "I thought about it, but couldn't form a response."
-
-            except urllib.error.HTTPError as e:
-                # Read error body
-                try:
-                    error_body = e.read().decode('utf-8')
-                except:
-                    error_body = "Could not read error body"
-                
-                error_msg = f"{model}: HTTP {e.code} - {error_body}"
-                print(f"[Gemini] Error: {error_msg}")
-                
-                # Retryable errors for SAME model
-                if e.code == 429 and attempt < max_retries_per_model:
-                     # Wait and retry same model
-                    delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
-                    print(f"[Gemini] Retrying {model} in {delay:.1f}s...")
-                    time.sleep(delay)
-                    continue
-                
-                all_errors.append(error_msg)
-                # If 404, 429, 503, try next MODEL
-                if e.code in [404, 429, 503, 400]: 
-                    break 
-                break
-                
-            except Exception as e:
-                print(f"[Gemini] Error: {e}")
-                all_errors.append(f"{model}: {str(e)}")
-                break # Try next model
-        
-    # If all Gemini models fail, try Groq as a last resort
-    if GROQ_API_KEY:
-        print("[Gemini] All Gemini models failed. Falling back to Groq (Text Only).")
-        try:
-            # Append note about missing files if relevant
-            groq_message = message
-            if files:
-                file_names = ", ".join([f.get("name", "unnamed") for f in files])
-                groq_message += f"\n\n[System Note: User attached files ({file_names}) but Gemini is overloaded. Please answer the text prompt only.]"
+        # Add files
+        for file in files:
+            mime_type = file.get("type", "application/octet-stream")
+            base64_data = file.get("content", "")
+            name = file.get("name", "unknown")
             
-            return _chat_with_groq(groq_message)
-        except Exception as e:
-            all_errors.append(f"Groq Fallback: {str(e)}")
+            # Images, audio, PDF → inline
+            if mime_type.startswith("image/") or mime_type.startswith("audio/") or mime_type == "application/pdf":
+                parts.append({
+                    "inline_data": {
+                        "mime_type": mime_type,
+                        "data": base64_data
+                    }
+                })
+            else:
+                # Extract text from other files
+                extracted = _extract_text_from_file(base64_data, mime_type, name)
+                if extracted:
+                    parts.append({"text": f"\n[File: {name}]\n{extracted}\n[End of file]\n"})
 
-    return f"All AI models failed.\nDetails:\n" + "\n".join(all_errors)
+        payload = {"contents": [{"parts": parts}]}
+        data_json = json.dumps(payload).encode("utf-8")
+
+        req = urllib.request.Request(
+            url, 
+            data=data_json, 
+            headers={"Content-Type": "application/json"}
+        )
+
+        with urllib.request.urlopen(req, timeout=20) as response:
+            resp_body = response.read().decode("utf-8")
+            resp_data = json.loads(resp_body)
+            try:
+                return resp_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            except (KeyError, IndexError):
+                return "Gemini processed the request but returned no text."
+
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else str(e)
+        print(f"[Gemini Vision] HTTP {e.code}: {error_body}")
+        
+        # If rate limited, try Groq as text fallback
+        if e.code == 429 and GROQ_API_KEY:
+            print("[Gemini Vision] Rate limited. Falling back to Groq (text only, no vision).")
+            fallback_msg = f"{message}\n\n[Note: Images were attached but Gemini is rate-limited. Answering text only.]"
+            try:
+                return _chat_with_groq(fallback_msg)
+            except:
+                pass
+        
+        return f"Vision error: HTTP {e.code} - Gemini overloaded. Try again in a minute."
+    
+    except Exception as e:
+        print(f"[Gemini Vision] Error: {e}")
+        return f"Vision error: {e}"
+
+
+def _chat_with_gemini_text(message: str) -> str:
+    """
+    Gemini text-only mode (fallback when Groq unavailable).
+    Single attempt, no retries.
+    """
+    if not GEMINI_API_KEY:
+        return "AI unavailable (no API keys configured)."
+
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+
+        payload = {
+            "contents": [{"parts": [{"text": message}]}]
+        }
+        
+        data_json = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url, 
+            data=data_json, 
+            headers={"Content-Type": "application/json"}
+        )
+
+        with urllib.request.urlopen(req, timeout=15) as response:
+            resp_body = response.read().decode("utf-8")
+            resp_data = json.loads(resp_body)
+            try:
+                return resp_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            except (KeyError, IndexError):
+                return "Gemini returned no response."
+
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else str(e)
+        print(f"[Gemini Text] HTTP {e.code}: {error_body}")
+        return f"Gemini error: {e.code} - Rate limited or overloaded."
+    
+    except Exception as e:
+        print(f"[Gemini Text] Error: {e}")
+        return f"Gemini error: {e}"
