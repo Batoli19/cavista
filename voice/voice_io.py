@@ -1,285 +1,232 @@
-﻿import os
-import re
+import os
 import threading
+import time
 import tempfile
 import subprocess
-import asyncio
 from queue import Queue, Empty
-from typing import Optional
 
+import numpy as np
+import sounddevice as sd
+import scipy.io.wavfile as wav
+import noisereduce as nr
+import whisper
 import pyttsx3
-import speech_recognition as sr
+import tkinter as tk
+from tkinter import ttk
+import pandas as pd
 
-# ============================================================
+# Optional: Speaker diarization
+from pyannote.audio import Pipeline
+
+# ==============================================================
 # CONFIG
-# ============================================================
+# ==============================================================
+SAMPLE_RATE = 16000
+CHANNELS = 1
+FILENAME = "consultation.wav"
 
-# --- STT ---
-STT_TIMEOUT = 5
-STT_PHRASE_TIME_LIMIT = 7
+recording = False
+audio_frames = []
+start_time = None
 
-# --- pyttsx3 fallback ---
+# Whisper model for multilingual transcription
+whisper_model = whisper.load_model("base")  # smaller or "medium" for better accuracy
+
+# Load ICD-10 diseases CSV
+# CSV format: disease_name,keywords (comma-separated, include Setswana + English)
+diseases_df = pd.read_csv("icd10_diseases.csv")
+diseases_df['keywords'] = diseases_df['keywords'].apply(lambda x: [k.strip().lower() for k in x.split(',')])
+
+# Pyttsx3 TTS fallback
 TTS_RATE = 180
 TTS_VOLUME = 1.0
+_tts_engine = pyttsx3.init()
+_tts_engine.setProperty("rate", TTS_RATE)
+_tts_engine.setProperty("volume", TTS_VOLUME)
 
-# --- Edge TTS (primary) ---
-EDGE_TTS_ENABLED = os.environ.get("EDGE_TTS_ENABLED", "1").lower() in ("1", "true", "yes", "on")
-EDGE_VOICE = os.environ.get("TTS_VOICE", "en-US-JennyNeural")
-EDGE_RATE = os.environ.get("TTS_RATE", "+0%")       # "+10%" or "-10%"
-EDGE_VOLUME = os.environ.get("TTS_VOLUME", "+0%")   # "+20%"
+# Edge TTS configuration
+EDGE_TTS_ENABLED = True
+EDGE_VOICE = "en-US-JennyNeural"
+EDGE_RATE = "+0%"
+EDGE_VOLUME = "+0%"
 
+try:
+    import edge_tts
+except ImportError:
+    EDGE_TTS_ENABLED = False
 
-# ============================================================
-# HELPERS
-# ============================================================
+# Pyannote speaker diarization
+diarization_pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
 
-def _clean_text(text: str) -> str:
-    return re.sub(r"\s+", " ", (text or "")).strip()
-
-def _split_sentences(text: str) -> list[str]:
-    """
-    Split into natural chunks but keep them reasonably short.
-    """
-    text = _clean_text(text)
-    if not text:
-        return []
-    parts = re.split(r"(?<=[.!?])\s+", text)
-    parts = [p.strip() for p in parts if p.strip()]
-    return parts if parts else [text]
-
-
-# ============================================================
-# EDGE TTS (PRIMARY) - WORKER THREAD
-# ============================================================
-
-def _try_import_edge_tts():
-    try:
-        import edge_tts  # type: ignore
-        return edge_tts
-    except Exception:
-        return None
-
-_edge_tts_mod = _try_import_edge_tts()
-
-class _EdgeTTSWorker:
-    """
-    Owns Edge-TTS generation in one background thread.
-    Generates an mp3 and plays it using Windows 'start'.
-    Falls back to pyttsx3 if edge-tts is missing or fails.
-    """
-    def __init__(self) -> None:
-        self._q: "Queue[str]" = Queue()
-        self._stop_event = threading.Event()
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
-
-    def _play_mp3_windows(self, path: str) -> None:
-        # Uses Windows built-in "start" to open default audio player
-        # /min keeps it from stealing focus too much
-        subprocess.Popen(["cmd", "/c", "start", "/min", "", path], shell=True)
-
-    def _generate_and_play(self, text: str) -> bool:
-        """
-        Returns True if Edge-TTS succeeded, False otherwise.
-        """
-        if not EDGE_TTS_ENABLED:
-            return False
-        if _edge_tts_mod is None:
-            return False
-
-        text = _clean_text(text)
-        if not text:
-            return True
-
-        # Keep file name constant to avoid temp-folder spam
-        out_path = os.path.join(tempfile.gettempdir(), "jarvis_tts.mp3")
-
-        async def _run_async():
-            communicate = _edge_tts_mod.Communicate(
-                text=text,
-                voice=EDGE_VOICE,
-                rate=EDGE_RATE,
-                volume=EDGE_VOLUME
-            )
-            await communicate.save(out_path)
-
-        try:
-            # Run async generation safely in this thread
-            asyncio.run(_run_async())
-            self._play_mp3_windows(out_path)
-            return True
-        except RuntimeError:
-            # If an event loop exists (rare), create a new loop
-            try:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(_run_async())
-                loop.close()
-                self._play_mp3_windows(out_path)
-                return True
-            except Exception:
-                return False
-        except Exception:
-            return False
-
-    def _run(self) -> None:
-        while not self._stop_event.is_set():
-            try:
-                text = self._q.get(timeout=0.1)
-            except Empty:
-                continue
-
-            # Drain queue: keep only latest (prevents backlog)
-            latest = text
-            while True:
-                try:
-                    latest = self._q.get_nowait()
-                except Empty:
-                    break
-
-            latest = _clean_text(latest)
-            if not latest:
-                continue
-
-            ok = self._generate_and_play(latest)
-            if not ok:
-                # Edge failed → fallback to pyttsx3
-                _tts.speak(latest)
-
-    def speak(self, text: str) -> None:
-        text = _clean_text(text)
-        if not text:
-            return
-        self._q.put(text)
-
-    def shutdown(self) -> None:
-        self._stop_event.set()
-
-
-# ============================================================
-# pyttsx3 FALLBACK - SINGLE OWNER WORKER THREAD
-# ============================================================
-
-class _TTSWorker:
-    """
-    Owns the pyttsx3 engine in exactly one thread.
-    This avoids pyttsx3/SAPI issues where only the first word is spoken.
-    """
-    def __init__(self, rate: int = TTS_RATE, volume: float = TTS_VOLUME) -> None:
-        self._engine = pyttsx3.init()
-        self._engine.setProperty("rate", rate)
-        self._engine.setProperty("volume", volume)
-
-        self._q: "Queue[str]" = Queue()
-        self._stop_event = threading.Event()
-
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
-
-    def _run(self) -> None:
-        while not self._stop_event.is_set():
-            try:
-                text = self._q.get(timeout=0.1)
-            except Empty:
-                continue
-
-            # Drain queue: keep only latest
-            latest = text
-            while True:
-                try:
-                    latest = self._q.get_nowait()
-                except Empty:
-                    break
-
-            latest = _clean_text(latest)
-            if not latest:
-                continue
-
-            try:
-                self._engine.stop()
-                for chunk in _split_sentences(latest):
-                    self._engine.say(chunk)
-                self._engine.runAndWait()
-            except Exception:
-                try:
-                    self._engine.stop()
-                except Exception:
-                    pass
-
-    def speak(self, text: str) -> None:
-        text = _clean_text(text)
-        if not text:
-            return
-        self._q.put(text)
-
-    def shutdown(self) -> None:
-        self._stop_event.set()
-        try:
-            self._engine.stop()
-        except Exception:
-            pass
-
-
-# Instantiate workers
-_tts = _TTSWorker()
-_edge_tts = _EdgeTTSWorker()
-
-
-def speak(text: str) -> None:
-    """
-    Non-blocking speak.
-    Uses Edge-TTS if available/enabled, otherwise falls back to pyttsx3.
-    """
-    text = _clean_text(text)
+# ==============================================================
+# UTILITY FUNCTIONS
+# ==============================================================
+def speak(text: str):
+    text = text.strip()
     if not text:
         return
-
-    # Prefer Edge TTS (neural, more human)
-    if EDGE_TTS_ENABLED and _edge_tts_mod is not None:
-        _edge_tts.speak(text)
+    if EDGE_TTS_ENABLED:
+        # Generate mp3 and play
+        out_path = os.path.join(tempfile.gettempdir(), "tts_output.mp3")
+        async def _run_edge():
+            communicate = edge_tts.Communicate(text=text, voice=EDGE_VOICE, rate=EDGE_RATE, volume=EDGE_VOLUME)
+            await communicate.save(out_path)
+        import asyncio
+        asyncio.run(_run_edge())
+        subprocess.Popen(["cmd", "/c", "start", "/min", "", out_path], shell=True)
     else:
-        _tts.speak(text)
+        _tts_engine.say(text)
+        _tts_engine.runAndWait()
 
+# ==============================================================
+# ADVANCED DIAGNOSIS ENGINE
+# ==============================================================
+def diagnose_advanced(text: str):
+    text = text.lower()
+    matched_diseases = []
 
-# ============================================================
-# STT: SPEECH TO TEXT
-# ============================================================
+    for _, row in diseases_df.iterrows():
+        for kw in row['keywords']:
+            if kw in text:
+                matched_diseases.append(row['disease_name'])
+                break
 
-_recognizer = sr.Recognizer()
+    if not matched_diseases:
+        return "No clear diagnosis detected. Recommend further medical evaluation."
 
-def listen_command(timeout: int = STT_TIMEOUT, phrase_time_limit: int = STT_PHRASE_TIME_LIMIT) -> str:
-    """
-    Push-to-talk listen once.
-    Returns recognized text OR 'VOICE_ERROR: ...' (never raises).
-    """
-    try:
-        with sr.Microphone() as source:
-            _recognizer.adjust_for_ambient_noise(source, duration=1)
-            audio = _recognizer.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+    severity_order = [
+        "Heart attack", "Stroke", "Cancer", "Brain tumor", "Pulmonary embolism",
+        "Sepsis", "Kidney failure", "Diabetes"
+    ]
 
-        text = _recognizer.recognize_google(audio)
-        text = _clean_text(text)
-        if not text:
-            return "VOICE_ERROR: Empty speech"
-        return text
+    sorted_diseases = sorted(
+        matched_diseases,
+        key=lambda x: severity_order.index(x) if x in severity_order else len(severity_order) + 1
+    )
 
-    except sr.WaitTimeoutError:
-        return "VOICE_ERROR: Timeout (no speech detected)"
-    except sr.UnknownValueError:
-        return "VOICE_ERROR: Could not understand speech"
-    except sr.RequestError:
-        return "VOICE_ERROR: Speech recognition service unavailable"
-    except Exception as e:
-        return f"VOICE_ERROR: {str(e)}"
+    return ", ".join(sorted_diseases)
 
+# ==============================================================
+# AUDIO RECORDING
+# ==============================================================
+def record_audio():
+    global recording, audio_frames
+    def callback(indata, frames, time_info, status):
+        if recording:
+            audio_frames.append(indata.copy())
+    with sd.InputStream(samplerate=SAMPLE_RATE, channels=CHANNELS, callback=callback):
+        while recording:
+            sd.sleep(100)
 
-# ============================================================
-# OPTIONAL: quick local test (won't run unless you run this file)
-# ============================================================
+def start_recording():
+    global recording, audio_frames, start_time
+    recording = True
+    audio_frames = []
+    start_time = time.time()
+    indicator_label.config(text="🟢 Listening", foreground="green")
+    threading.Thread(target=record_audio, daemon=True).start()
+    update_timer()
 
-if __name__ == "__main__":
-    print("EDGE_TTS_ENABLED:", EDGE_TTS_ENABLED)
-    print("EDGE_TTS_AVAILABLE:", _edge_tts_mod is not None)
-    speak("Alright. I created the project. Want me to generate a plan next?")
-    cmd = listen_command()
-    print(cmd)
+def stop_recording():
+    global recording
+    recording = False
+    indicator_label.config(text="🔴 Stopped", foreground="red")
+    save_audio()
+
+# ==============================================================
+# SAVE AUDIO + NOISE REDUCTION
+# ==============================================================
+def save_audio():
+    global audio_frames
+    if not audio_frames:
+        return
+    audio = np.concatenate(audio_frames, axis=0)
+    reduced = nr.reduce_noise(y=audio.flatten(), sr=SAMPLE_RATE)
+    wav.write(FILENAME, SAMPLE_RATE, reduced)
+    process_audio(FILENAME)
+
+# ==============================================================
+# PROCESS AUDIO: DIARIZATION + TRANSCRIPTION + DIAGNOSIS
+# ==============================================================
+def process_audio(file_path):
+    # Speaker diarization
+    diarization = diarization_pipeline(file_path)
+    segments = []
+    for turn, _, speaker in diarization.itertracks(yield_label=True):
+        segments.append((turn.start, turn.end, speaker))
+
+    full_transcript = ""
+    patient_transcript = ""
+
+    for start, end, speaker in segments:
+        # Extract audio segment
+        start_sample = int(start * SAMPLE_RATE)
+        end_sample = int(end * SAMPLE_RATE)
+        segment_audio = np.concatenate(audio_frames, axis=0)[start_sample:end_sample]
+
+        # Save temp segment file
+        temp_path = os.path.join(tempfile.gettempdir(), f"seg_{speaker}.wav")
+        wav.write(temp_path, SAMPLE_RATE, segment_audio)
+
+        # Transcribe with Whisper
+        result = whisper_model.transcribe(temp_path)
+        text = result['text']
+        full_transcript += f"[{speaker}] {text}\n"
+
+        # Assume patient = main speaker
+        if "SPEAKER_0" in speaker:  # Customize depending on diarization
+            patient_transcript += text + " "
+
+    transcript_box.delete("1.0", tk.END)
+    transcript_box.insert(tk.END, full_transcript)
+
+    # Diagnose only patient speech
+    diagnosis_text = diagnose_advanced(patient_transcript)
+    diagnosis_box.delete("1.0", tk.END)
+    diagnosis_box.insert(tk.END, diagnosis_text)
+
+    # Speak diagnosis
+    speak(diagnosis_text)
+
+# ==============================================================
+# TIMER
+# ==============================================================
+def update_timer():
+    if recording:
+        elapsed = int(time.time() - start_time)
+        mins = elapsed // 60
+        secs = elapsed % 60
+        timer_label.config(text=f"{mins:02d}:{secs:02d}")
+        root.after(1000, update_timer)
+
+# ==============================================================
+# GUI
+# ==============================================================
+root = tk.Tk()
+root.title("Advanced Multilingual Clinical Voice Assistant")
+root.geometry("800x600")
+
+title = ttk.Label(root, text="Multilingual Clinical Consultation System", font=("Arial", 16))
+title.pack(pady=10)
+
+indicator_label = ttk.Label(root, text="🔴 Idle", font=("Arial", 12))
+indicator_label.pack()
+
+timer_label = ttk.Label(root, text="00:00", font=("Arial", 18))
+timer_label.pack(pady=5)
+
+start_btn = ttk.Button(root, text="Start Consultation", command=start_recording)
+start_btn.pack(pady=5)
+
+stop_btn = ttk.Button(root, text="Stop Consultation", command=stop_recording)
+stop_btn.pack(pady=5)
+
+ttk.Label(root, text="Transcript").pack()
+transcript_box = tk.Text(root, height=12)
+transcript_box.pack()
+
+ttk.Label(root, text="AI Preliminary Diagnosis").pack()
+diagnosis_box = tk.Text(root, height=8)
+diagnosis_box.pack()
+
+root.mainloop()
