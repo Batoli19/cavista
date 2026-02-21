@@ -3,7 +3,8 @@ import threading
 import time
 import tempfile
 import subprocess
-from queue import Queue, Empty
+import logging
+from queue import Queue
 
 import numpy as np
 import sounddevice as sd
@@ -14,9 +15,16 @@ import pyttsx3
 import tkinter as tk
 from tkinter import ttk
 import pandas as pd
-
-# Optional: Speaker diarization
 from pyannote.audio import Pipeline
+
+# ==============================================================
+# LOGGING SYSTEM (NEW)
+# ==============================================================
+logging.basicConfig(
+    filename="system.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # ==============================================================
 # CONFIG
@@ -29,57 +37,50 @@ recording = False
 audio_frames = []
 start_time = None
 
-# Whisper model for multilingual transcription
-whisper_model = whisper.load_model("base")  # smaller or "medium" for better accuracy
+# Whisper model (dynamic selection ready)
+MODEL_NAME = "base"
+whisper_model = whisper.load_model(MODEL_NAME)
 
-# Load ICD-10 diseases CSV
-# CSV format: disease_name,keywords (comma-separated, include Setswana + English)
+# Load ICD-10 CSV
 diseases_df = pd.read_csv("icd10_diseases.csv")
-diseases_df['keywords'] = diseases_df['keywords'].apply(lambda x: [k.strip().lower() for k in x.split(',')])
+diseases_df['keywords'] = diseases_df['keywords'].apply(
+    lambda x: [k.strip().lower() for k in x.split(',')]
+)
 
-# Pyttsx3 TTS fallback
-TTS_RATE = 180
-TTS_VOLUME = 1.0
+# TTS
 _tts_engine = pyttsx3.init()
-_tts_engine.setProperty("rate", TTS_RATE)
-_tts_engine.setProperty("volume", TTS_VOLUME)
+_tts_engine.setProperty("rate", 180)
+_tts_engine.setProperty("volume", 1.0)
 
-# Edge TTS configuration
-EDGE_TTS_ENABLED = True
-EDGE_VOICE = "en-US-JennyNeural"
-EDGE_RATE = "+0%"
-EDGE_VOLUME = "+0%"
-
+# Speaker diarization
 try:
-    import edge_tts
-except ImportError:
-    EDGE_TTS_ENABLED = False
-
-# Pyannote speaker diarization
-diarization_pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
+    diarization_pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
+except Exception as e:
+    logging.error(f"Diarization model failed: {e}")
+    diarization_pipeline = None
 
 # ==============================================================
-# UTILITY FUNCTIONS
+# SPEAK FUNCTION
 # ==============================================================
 def speak(text: str):
-    text = text.strip()
-    if not text:
-        return
-    if EDGE_TTS_ENABLED:
-        # Generate mp3 and play
-        out_path = os.path.join(tempfile.gettempdir(), "tts_output.mp3")
-        async def _run_edge():
-            communicate = edge_tts.Communicate(text=text, voice=EDGE_VOICE, rate=EDGE_RATE, volume=EDGE_VOLUME)
-            await communicate.save(out_path)
-        import asyncio
-        asyncio.run(_run_edge())
-        subprocess.Popen(["cmd", "/c", "start", "/min", "", out_path], shell=True)
-    else:
+    try:
         _tts_engine.say(text)
         _tts_engine.runAndWait()
+    except Exception as e:
+        logging.error(f"TTS error: {e}")
 
 # ==============================================================
-# ADVANCED DIAGNOSIS ENGINE
+# RISK CLASSIFICATION (NEW)
+# ==============================================================
+def risk_level(diseases):
+    critical = ["Heart attack", "Stroke", "Sepsis"]
+    for d in critical:
+        if d in diseases:
+            return "CRITICAL"
+    return "MODERATE"
+
+# ==============================================================
+# ADVANCED DIAGNOSIS ENGINE (Enhanced)
 # ==============================================================
 def diagnose_advanced(text: str):
     text = text.lower()
@@ -95,25 +96,32 @@ def diagnose_advanced(text: str):
         return "No clear diagnosis detected. Recommend further medical evaluation."
 
     severity_order = [
-        "Heart attack", "Stroke", "Cancer", "Brain tumor", "Pulmonary embolism",
-        "Sepsis", "Kidney failure", "Diabetes"
+        "Heart attack", "Stroke", "Cancer", "Brain tumor",
+        "Pulmonary embolism", "Sepsis", "Kidney failure", "Diabetes"
     ]
 
     sorted_diseases = sorted(
         matched_diseases,
-        key=lambda x: severity_order.index(x) if x in severity_order else len(severity_order) + 1
+        key=lambda x: severity_order.index(x) if x in severity_order else len(severity_order)
     )
 
-    return ", ".join(sorted_diseases)
+    confidence = min(len(sorted_diseases) * 30, 100)
+    risk = risk_level(sorted_diseases)
+
+    return f"Possible Conditions: {', '.join(sorted_diseases)}\nConfidence: {confidence}%\nRisk Level: {risk}"
 
 # ==============================================================
-# AUDIO RECORDING
+# RECORDING
 # ==============================================================
 def record_audio():
     global recording, audio_frames
+
     def callback(indata, frames, time_info, status):
         if recording:
             audio_frames.append(indata.copy())
+            volume = int(np.linalg.norm(indata) * 10)
+            audio_level_label.config(text=f"Audio Level: {volume}")
+
     with sd.InputStream(samplerate=SAMPLE_RATE, channels=CHANNELS, callback=callback):
         while recording:
             sd.sleep(100)
@@ -124,6 +132,7 @@ def start_recording():
     audio_frames = []
     start_time = time.time()
     indicator_label.config(text="🟢 Listening", foreground="green")
+    logging.info("Recording started.")
     threading.Thread(target=record_audio, daemon=True).start()
     update_timer()
 
@@ -131,62 +140,86 @@ def stop_recording():
     global recording
     recording = False
     indicator_label.config(text="🔴 Stopped", foreground="red")
+    logging.info("Recording stopped.")
     save_audio()
 
 # ==============================================================
-# SAVE AUDIO + NOISE REDUCTION
+# SAVE AUDIO
 # ==============================================================
 def save_audio():
-    global audio_frames
     if not audio_frames:
         return
-    audio = np.concatenate(audio_frames, axis=0)
-    reduced = nr.reduce_noise(y=audio.flatten(), sr=SAMPLE_RATE)
-    wav.write(FILENAME, SAMPLE_RATE, reduced)
-    process_audio(FILENAME)
+    try:
+        audio = np.concatenate(audio_frames, axis=0)
+        reduced = nr.reduce_noise(y=audio.flatten(), sr=SAMPLE_RATE)
+        wav.write(FILENAME, SAMPLE_RATE, reduced)
+        logging.info("Audio saved successfully.")
+        process_audio(FILENAME)
+    except Exception as e:
+        logging.error(f"Audio save error: {e}")
 
 # ==============================================================
-# PROCESS AUDIO: DIARIZATION + TRANSCRIPTION + DIAGNOSIS
+# PROCESS AUDIO
 # ==============================================================
 def process_audio(file_path):
-    # Speaker diarization
-    diarization = diarization_pipeline(file_path)
-    segments = []
-    for turn, _, speaker in diarization.itertracks(yield_label=True):
-        segments.append((turn.start, turn.end, speaker))
-
     full_transcript = ""
     patient_transcript = ""
 
+    try:
+        if diarization_pipeline:
+            diarization = diarization_pipeline(file_path)
+            segments = [(turn.start, turn.end, speaker)
+                        for turn, _, speaker in diarization.itertracks(yield_label=True)]
+        else:
+            segments = [(0, len(audio_frames)/SAMPLE_RATE, "SPEAKER_0")]
+    except Exception as e:
+        logging.error(f"Diarization failed: {e}")
+        segments = [(0, len(audio_frames)/SAMPLE_RATE, "SPEAKER_0")]
+
     for start, end, speaker in segments:
-        # Extract audio segment
-        start_sample = int(start * SAMPLE_RATE)
-        end_sample = int(end * SAMPLE_RATE)
-        segment_audio = np.concatenate(audio_frames, axis=0)[start_sample:end_sample]
+        try:
+            start_sample = int(start * SAMPLE_RATE)
+            end_sample = int(end * SAMPLE_RATE)
+            segment_audio = np.concatenate(audio_frames, axis=0)[start_sample:end_sample]
 
-        # Save temp segment file
-        temp_path = os.path.join(tempfile.gettempdir(), f"seg_{speaker}.wav")
-        wav.write(temp_path, SAMPLE_RATE, segment_audio)
+            temp_path = os.path.join(tempfile.gettempdir(), f"seg_{speaker}.wav")
+            wav.write(temp_path, SAMPLE_RATE, segment_audio)
 
-        # Transcribe with Whisper
-        result = whisper_model.transcribe(temp_path)
-        text = result['text']
-        full_transcript += f"[{speaker}] {text}\n"
+            result = whisper_model.transcribe(temp_path)
+            text = result['text']
 
-        # Assume patient = main speaker
-        if "SPEAKER_0" in speaker:  # Customize depending on diarization
-            patient_transcript += text + " "
+            full_transcript += f"[{speaker}] {text}\n"
+
+            if "SPEAKER_0" in speaker:
+                patient_transcript += text + " "
+        except Exception as e:
+            logging.error(f"Segment processing error: {e}")
 
     transcript_box.delete("1.0", tk.END)
     transcript_box.insert(tk.END, full_transcript)
 
-    # Diagnose only patient speech
     diagnosis_text = diagnose_advanced(patient_transcript)
+
     diagnosis_box.delete("1.0", tk.END)
     diagnosis_box.insert(tk.END, diagnosis_text)
 
-    # Speak diagnosis
     speak(diagnosis_text)
+    save_consultation_history(diagnosis_text)
+
+# ==============================================================
+# SAVE HISTORY (NEW)
+# ==============================================================
+def save_consultation_history(diagnosis_text):
+    data = {
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "duration": timer_label.cget("text"),
+        "diagnosis": diagnosis_text
+    }
+    df = pd.DataFrame([data])
+    df.to_csv("consultation_history.csv",
+              mode='a',
+              header=not os.path.exists("consultation_history.csv"),
+              index=False)
 
 # ==============================================================
 # TIMER
@@ -203,23 +236,23 @@ def update_timer():
 # GUI
 # ==============================================================
 root = tk.Tk()
-root.title("Advanced Multilingual Clinical Voice Assistant")
-root.geometry("800x600")
+root.title("Advanced AI Clinical Consultation System")
+root.geometry("850x650")
 
-title = ttk.Label(root, text="Multilingual Clinical Consultation System", font=("Arial", 16))
-title.pack(pady=10)
+ttk.Label(root, text="Multilingual AI Clinical Consultation System",
+          font=("Arial", 16)).pack(pady=10)
 
 indicator_label = ttk.Label(root, text="🔴 Idle", font=("Arial", 12))
 indicator_label.pack()
 
 timer_label = ttk.Label(root, text="00:00", font=("Arial", 18))
-timer_label.pack(pady=5)
+timer_label.pack()
 
-start_btn = ttk.Button(root, text="Start Consultation", command=start_recording)
-start_btn.pack(pady=5)
+audio_level_label = ttk.Label(root, text="Audio Level: 0")
+audio_level_label.pack()
 
-stop_btn = ttk.Button(root, text="Stop Consultation", command=stop_recording)
-stop_btn.pack(pady=5)
+ttk.Button(root, text="Start Consultation", command=start_recording).pack(pady=5)
+ttk.Button(root, text="Stop Consultation", command=stop_recording).pack(pady=5)
 
 ttk.Label(root, text="Transcript").pack()
 transcript_box = tk.Text(root, height=12)
