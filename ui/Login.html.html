@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoiceFirst — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0a1628;
+      --navy-card:  #0d1f3c;
+      --teal:       #00c9a7;
+      --sky:        #48cae4;
+      --patient:    #7c6af7;
+      --patient2:   #a78bfa;
+      --white:      #f0f4ff;
+      --muted:      #7a8fad;
+      --danger:     #ff6b6b;
+      --warn:       #ffd166;
+      --border-doc: rgba(0,201,167,0.2);
+      --border-pat: rgba(124,106,247,0.2);
+    }
+
+    html, body { height: 100%; font-family: 'Sora', sans-serif; background: var(--navy); color: var(--white); overflow-x: hidden; }
+
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 20%, rgba(0,201,167,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(72,202,228,0.06) 0%, transparent 60%),
+        var(--navy);
+      transition: background 0.6s;
+    }
+    .bg.pat {
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 20%, rgba(124,106,247,0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 80%, rgba(167,139,250,0.06) 0%, transparent 60%),
+        var(--navy);
+    }
+
+    .grid {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 52px 52px;
+    }
+
+    .page { position: relative; z-index: 1; min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+
+    /* ── LEFT ── */
+    .left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 56px 60px; border-right: 1px solid var(--border-doc);
+      position: relative; overflow: hidden; transition: border-color 0.4s;
+    }
+    .left.pat { border-color: var(--border-pat); }
+    .left::after {
+      content: ''; position: absolute; right: -1px; top: 15%; bottom: 15%;
+      width: 2px; background: linear-gradient(to bottom, transparent, var(--teal), transparent);
+      animation: glow 3s ease-in-out infinite; transition: background 0.4s;
+    }
+    .left.pat::after { background: linear-gradient(to bottom, transparent, var(--patient), transparent); }
+    @keyframes glow { 0%,100%{opacity:0.2} 50%{opacity:1} }
+
+    /* role pills */
+    .role-pills { display: flex; gap: 10px; margin-bottom: 44px; animation: up 0.5s ease both; }
+    .pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 18px; border-radius: 99px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      cursor: pointer; transition: all 0.3s;
+    }
+    .pill.doc { border-color: var(--teal); background: rgba(0,201,167,0.1); color: var(--teal); box-shadow: 0 0 18px rgba(0,201,167,0.15); }
+    .pill.pat { border-color: var(--patient); background: rgba(124,106,247,0.1); color: var(--patient2); box-shadow: 0 0 18px rgba(124,106,247,0.15); }
+
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; animation: up 0.5s 0.1s ease both; }
+    .brand-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--teal), var(--sky));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; box-shadow: 0 0 22px rgba(0,201,167,0.2);
+      transition: all 0.4s;
+    }
+    .brand-icon.pat { background: linear-gradient(135deg, var(--patient), var(--patient2)); box-shadow: 0 0 22px rgba(124,106,247,0.2); }
+    .brand-name { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+    .brand-name span { color: var(--teal); transition: color 0.4s; }
+    .brand-name span.pat { color: var(--patient2); }
+
+    .htag { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; transition: color 0.4s; animation: up 0.5s 0.15s ease both; }
+    .htag.pat { color: var(--patient2); }
+
+    .htitle { font-size: clamp(28px, 3vw, 44px); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 18px; animation: up 0.5s 0.2s ease both; }
+    .htitle .ad { color: var(--teal); }
+    .htitle .ap { color: var(--patient2); display: none; }
+
+    .hdesc { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 380px; margin-bottom: 36px; animation: up 0.5s 0.25s ease both; }
+
+    .feats { display: flex; flex-direction: column; gap: 11px; animation: up 0.5s 0.3s ease both; }
+    .feat {
+      display: flex; align-items: flex-start; gap: 13px;
+      padding: 13px 16px; border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-doc);
+      transition: all 0.3s; cursor: default;
+    }
+    .feat.pat { border-color: var(--border-pat); }
+    .feat:hover { transform: translateX(4px); background: rgba(0,201,167,0.05); border-color: rgba(0,201,167,0.3); }
+    .feat.pat:hover { background: rgba(124,106,247,0.05); border-color: rgba(124,106,247,0.3); }
+    .feat-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+    .feat-text strong { display: block; font-size: 12px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .feat-text span { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    /* ── RIGHT ── */
+    .right { display: flex; align-items: center; justify-content: center; padding: 40px 52px; }
+    .card { width: 100%; max-width: 440px; animation: up 0.6s 0.2s ease both; }
+
+    /* role cards */
+    .role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .rcard {
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      padding: 16px 10px; border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.08);
+      cursor: pointer; transition: all 0.3s; text-align: center;
+    }
+    .rcard:hover { background: rgba(255,255,255,0.07); }
+    .rcard.doc { background: rgba(0,201,167,0.08); border-color: var(--teal); box-shadow: 0 0 22px rgba(0,201,167,0.12); }
+    .rcard.pat { background: rgba(124,106,247,0.08); border-color: var(--patient); box-shadow: 0 0 22px rgba(124,106,247,0.12); }
+    .rcard-icon { font-size: 26px; }
+    .rcard-label { font-size: 13px; font-weight: 700; }
+    .rcard-sub { font-size: 11px; color: var(--muted); }
+
+    /* tabs */
+    .tabs { display: flex; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
+    .tab { flex: 1; padding: 9px; border: none; background: transparent; color: var(--muted); font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500; border-radius: 9px; cursor: pointer; transition: all 0.3s; }
+    .tab.doc { background: linear-gradient(135deg, var(--teal), var(--sky)); color: var(--navy); font-weight: 700; box-shadow: 0 4px 14px rgba(0,201,167,0.3); }
+    .tab.pat { background: linear-gradient(135deg, var(--patient), var(--patient2)); color: var(--white); font-weight: 700; box-shadow: 0 4px 14px rgba(124,106,247,0.3); }
+
+    /* forms */
+    .fs { display: none; }
+    .fs.on { display: block; animation: up 0.35s ease both; }
+
+    .ftitle { font-size: 22px; font-weight: 700; letter-spacing: -0.8px; margin-bottom: 4px; }
+    .fsub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+
+    /* badge */
+    .badge {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 13px; border-radius: 9px; font-size: 12px;
+      background: rgba(124,106,247,0.08); border: 1px solid rgba(124,106,247,0.2);
+      color: var(--patient2); margin-bottom: 18px;
+    }
+
+    /* fields */
+    .f { margin-bottom: 14px; }
+    .f label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .iw { position: relative; }
+    .iw .ic { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted); pointer-events: none; }
+    .iw input, .f select {
+      width: 100%; padding: 11px 13px 11px 40px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; color: var(--white); font-family: 'Sora', sans-serif; font-size: 13px;
+      outline: none; transition: all 0.3s;
+    }
+    .f select { padding-left: 13px; }
+    .iw input::placeholder { color: rgba(122,143,173,0.45); }
+    .iw input:focus { border-color: var(--teal); background: rgba(0,201,167,0.05); box-shadow: 0 0 0 3px rgba(0,201,167,0.07); }
+    .pat-form .iw input:focus { border-color: var(--patient); background: rgba(124,106,247,0.05); box-shadow: 0 0 0 3px rgba(124,106,247,0.07); }
+    .f select:focus { border-color: var(--teal); }
+    .f select option { background: var(--navy-card); }
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* buttons */
+    .btn {
+      width: 100%; padding: 12px; border: none; border-radius: 10px;
+      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.3s; margin-top: 5px;
+      background: linear-gradient(135deg, var(--teal), var(--sky));
+      color: var(--navy); box-shadow: 0 4px 18px rgba(0,201,167,0.25);
+    }
+    .btn.p { background: linear-gradient(135deg, var(--patient), var(--patient2)); color: var(--white); box-shadow: 0 4px 18px rgba(124,106,247,0.25); }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; filter: none; }
+    .btn-back { background: rgba(255,255,255,0.07); color: var(--white); box-shadow: none; flex: 0.4; }
+    .btn-back:hover { background: rgba(255,255,255,0.12); transform: none; filter: none; }
+    .brow { display: flex; gap: 10px; margin-top: 5px; }
+    .brow .btn:last-child { flex: 1; }
+
+    /* strength */
+    .sbar { display: flex; gap: 4px; margin-top: 6px; }
+    .ss { flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 99px; transition: background 0.3s; }
+    .ss.w { background: var(--danger); }
+    .ss.m { background: var(--warn); }
+    .ss.s { background: var(--teal); }
+    .slabel { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* steps */
+    .steps { display: flex; align-items: center; gap: 7px; margin-bottom: 22px; }
+    .stp { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+    .stn { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; }
+    .stp.ad .stn { background: var(--teal); border-color: var(--teal); color: var(--navy); }
+    .stp.ap .stn { background: var(--patient); border-color: var(--patient); color: var(--white); }
+    .stp.dn .stn { background: rgba(0,201,167,0.15); border-color: var(--teal); color: var(--teal); }
+    .stl { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+
+    /* alert */
+    .alert { padding: 11px 14px; border-radius: 10px; font-size: 12px; margin-bottom: 14px; display: none; align-items: center; gap: 9px; }
+    .alert.err { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.25); color: var(--danger); display: flex; }
+    .alert.ok  { background: rgba(0,201,167,0.1);  border: 1px solid rgba(0,201,167,0.25);  color: var(--teal);   display: flex; }
+
+    /* footer */
+    .ffoot { margin-top: 18px; text-align: center; font-size: 12px; color: var(--muted); }
+    .ffoot a { color: var(--teal); text-decoration: none; font-weight: 600; cursor: pointer; }
+    .ffoot a.p { color: var(--patient2); }
+
+    @keyframes up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    @media(max-width:900px) {
+      .page { grid-template-columns: 1fr; }
+      .left { display: none; }
+      .right { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg" id="bg"></div>
+<div class="grid"></div>
+
+<div class="page">
+
+  <!-- ══════════════ LEFT PANEL ══════════════ -->
+  <div class="left" id="LP">
+
+    <div class="role-pills">
+      <div class="pill doc" id="pill-d" onclick="setRole('doctor')">👨‍⚕️ Doctor</div>
+      <div class="pill"     id="pill-p" onclick="setRole('patient')">🧑 Patient</div>
+    </div>
+
+    <div class="brand">
+      <div class="brand-icon" id="BI">🎙️</div>
+      <div class="brand-name">Voice<span id="BA">First</span></div>
+    </div>
+
+    <div class="htag" id="HT">Clinical Documentation System</div>
+
+    <h1 class="htitle">
+      Medicine at the<br/>speed of
+      <span class="ad" id="AD">speech.</span>
+      <span class="ap" id="AP">your voice.</span>
+    </h1>
+
+    <p class="hdesc" id="HD">
+      Record consultations, extract patient data automatically,
+      get AI-powered diagnosis suggestions — all from a single conversation.
+      Zero typing required.
+    </p>
+
+    <div class="feats" id="FL"></div>
+  </div>
+
+  <!-- ══════════════ RIGHT PANEL ══════════════ -->
+  <div class="right">
+    <div class="card">
+
+      <!-- ROLE CARDS -->
+      <div class="role-cards">
+        <div class="rcard doc" id="RC-d" onclick="setRole('doctor')">
+          <div class="rcard-icon">👨‍⚕️</div>
+          <div class="rcard-label">I'm a Doctor</div>
+          <div class="rcard-sub">Clinician access</div>
+        </div>
+        <div class="rcard" id="RC-p" onclick="setRole('patient')">
+          <div class="rcard-icon">🧑‍🤝‍🧑</div>
+          <div class="rcard-label">I'm a Patient</div>
+          <div class="rcard-sub">Patient portal</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab doc" id="T-li" onclick="switchTab('login')">Sign In</button>
+        <button class="tab"     id="T-su" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <!-- ALERT -->
+      <div class="alert" id="AL">
+        <span id="AI">⚠️</span><span id="AM"></span>
+      </div>
+
+      <!-- ══ DOCTOR LOGIN ══ -->
+      <div class="fs on" id="F-dl">
+        <h2 class="ftitle">Welcome back, Doctor</h2>
+        <p class="fsub">Sign in to your clinical dashboard</p>
+        <div class="f"><label>Email</label>
+          <div class="iw"><span class="ic">📧</span><input type="email" id="dl-e" placeholder="doctor@hospital.com"/></div>
+        </div>
+        <div class="f"><label>Password</label>
+          <div class="iw"><span class="ic">🔒</span><input type="password" id="dl-p" placeholder="Your password"/></div>
+        </div>
+        <button class="btn" id="dl-btn" onclick="docLogin()">Sign In to Dashboard →</button>
+        <div class="ffoot">No account? <a onclick="switchTab('signup')">Register here</a></div>
+      </div>
+
+      <!-- ══ PATIENT LOGIN ══ -->
+      <div class="fs" id="F-pl">
+        <div class="badge">🧑 Patient Portal Access</div>
+        <h2 class="ftitle">Welcome back</h2>
+        <p class="fsub">Sign in to your patient account</p>
+        <div class="f pat-form"><label>Email</label>
+          <div class="iw"><span class="ic">📧</span><input type="email" id="pl-e" placeholder="yourname@email.com"/></div>
+        </div>
+        <div class="f pat-form"><label>Password</label>
+          <div class="iw"><span class="ic">🔒</span><input type="password" id="pl-p" placeholder="Your password"/></div>
+        </div>
+        <button class="btn p" id="pl-btn" onclick="patLogin()">Sign In to Patient Portal →</button>
+        <div class="ffoot">No account? <a class="p" onclick="switchTab('signup')">Register here</a></div>
+      </div>
+
+      <!-- ══ DOCTOR SIGNUP ══ -->
+      <div class="fs" id="F-ds">
+        <div class="steps">
+          <div class="stp ad" id="dsi1"><div class="stn">1</div><span>Account</span></div>
+          <div class="stl"></div>
+          <div class="stp" id="dsi2"><div class="stn">2</div><span>Profile</span></div>
+          <div class="stl"></div>
+          <div class="stp" id="dsi3"><div class="stn">3</div><span>Done</span></div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div id="ds1">
+          <h2 class="ftitle">Create doctor account</h2>
+          <p class="fsub">Step 1 of 2 — Login details</p>
+          <div class="f"><label>Full Name</label>
+            <div class="iw"><span class="ic">👤</span><input type="text" id="ds-n" placeholder="Dr. John Smith"/></div>
+          </div>
+          <div class="f"><label>Email</label>
+            <div class="iw"><span class="ic">📧</span><input type="email" id="ds-e" placeholder="doctor@hospital.com"/></div>
+          </div>
+          <div class="f"><label>Password</label>
+            <div class="iw"><span class="ic">🔒</span>
+              <input type="password" id="ds-pw" placeholder="Min. 8 characters" oninput="strength(this.value,'ds')"/>
+            </div>
+            <div class="sbar"><div class="ss" id="ds-s1"></div><div class="ss" id="ds-s2"></div><div class="ss" id="ds-s3"></div><div class="ss" id="ds-s4"></div></div>
+            <div class="slabel" id="ds-sl"></div>
+          </div>
+          <div class="f"><label>Confirm Password</label>
+            <div class="iw"><span class="ic">🔒</span><input type="password" id="ds-cf" placeholder="Repeat password"/></div>
+          </div>
+          <button class="btn" onclick="dsNext()">Continue →</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div id="ds2" style="display:none">
+          <h2 class="ftitle">Professional details</h2>
+          <p class="fsub">Step 2 of 2 — Your practice info</p>
+          <div class="f"><label>Medical License No.</label>
+            <div class="iw"><span class="ic">🪪</span><input type="text" id="ds-lic" placeholder="LIC123456"/></div>
+          </div>
+          <div class="f"><label>Specialization</label>
+            <select id="ds-sp">
+              <option value="" disabled selected>Select specialization</option>
+              <option>General Practitioner</option><option>Internal Medicine</option>
+              <option>Paediatrics</option><option>Cardiology</option>
+              <option>Neurology</option><option>Orthopaedics</option>
+              <option>Gynaecology</option><option>Emergency Medicine</option>
+              <option>Psychiatry</option><option>Surgery</option><option>Other</option>
+            </select>
+          </div>
+          <div class="f"><label>Hospital / Clinic</label>
+            <div class="iw"><span class="ic">🏥</span><input type="text" id="ds-h" placeholder="Gaborone Private Hospital"/></div>
+          </div>
+          <div class="f"><label>Phone Number</label>
+            <div class="iw"><span class="ic">📞</span><input type="tel" id="ds-ph" placeholder="0712 345 678"/></div>
+          </div>
+          <div class="brow">
+            <button class="btn btn-back" onclick="dsPrev()">← Back</button>
+            <button class="btn" id="ds-btn" onclick="docSignup()">Create Account</button>
+          </div>
+        </div>
+        <div class="ffoot">Have an account? <a onclick="switchTab('login')">Sign in</a></div>
+      </div>
+
+      <!-- ══ PATIENT SIGNUP ══ -->
+      <div class="fs" id="F-ps">
+        <div class="steps">
+          <div class="stp ap" id="psi1"><div class="stn">1</div><span>Account</span></div>
+          <div class="stl"></div>
+          <div class="stp" id="psi2"><div class="stn">2</div><span>Details</span></div>
+          <div class="stl"></div>
+          <div class="stp" id="psi3"><div class="stn">3</div><span>Done</span></div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div id="ps1">
+          <div class="badge">🧑 Creating a Patient Account</div>
+          <h2 class="ftitle">Create your account</h2>
+          <p class="fsub">Step 1 of 2 — Login details</p>
+          <div class="f pat-form"><label>Full Name</label>
+            <div class="iw"><span class="ic">👤</span><input type="text" id="ps-n" placeholder="John Doe"/></div>
+          </div>
+          <div class="f pat-form"><label>Email</label>
+            <div class="iw"><span class="ic">📧</span><input type="email" id="ps-e" placeholder="yourname@email.com"/></div>
+          </div>
+          <div class="f pat-form"><label>Password</label>
+            <div class="iw"><span class="ic">🔒</span>
+              <input type="password" id="ps-pw" placeholder="Min. 8 characters" oninput="strength(this.value,'ps')"/>
+            </div>
+            <div class="sbar"><div class="ss" id="ps-s1"></div><div class="ss" id="ps-s2"></div><div class="ss" id="ps-s3"></div><div class="ss" id="ps-s4"></div></div>
+            <div class="slabel" id="ps-sl"></div>
+          </div>
+          <div class="f pat-form"><label>Confirm Password</label>
+            <div class="iw"><span class="ic">🔒</span><input type="password" id="ps-cf" placeholder="Repeat password"/></div>
+          </div>
+          <button class="btn p" onclick="psNext()">Continue →</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div id="ps2" style="display:none">
+          <h2 class="ftitle">Your personal details</h2>
+          <p class="fsub">Step 2 of 2 — Tell us about yourself</p>
+          <div class="frow">
+            <div class="f"><label>Date of Birth</label>
+              <div class="iw"><span class="ic">🎂</span><input type="date" id="ps-dob"/></div>
+            </div>
+            <div class="f"><label>Gender</label>
+              <select id="ps-g"><option value="" disabled selected>Select</option>
+                <option>Male</option><option>Female</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="f pat-form"><label>Phone Number</label>
+            <div class="iw"><span class="ic">📞</span><input type="tel" id="ps-ph" placeholder="0712 345 678"/></div>
+          </div>
+          <div class="f pat-form"><label>National ID</label>
+            <div class="iw"><span class="ic">🪪</span><input type="text" id="ps-id" placeholder="123456789"/></div>
+          </div>
+          <div class="f pat-form"><label>Your Doctor (optional)</label>
+            <div class="iw"><span class="ic">👨‍⚕️</span><input type="text" id="ps-dr" placeholder="Dr. Smith"/></div>
+          </div>
+          <div class="brow">
+            <button class="btn btn-back" onclick="psPrev()">← Back</button>
+            <button class="btn p" id="ps-btn" onclick="patSignup()">Create Account</button>
+          </div>
+        </div>
+        <div class="ffoot">Have an account? <a class="p" onclick="switchTab('login')">Sign in</a></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let role = 'doctor', tab = 'login'
+
+  const docFeats = [
+    { i:'🎤', t:'Voice Recording', d:'Record consultations in real time with live transcription' },
+    { i:'🧠', t:'AI Diagnosis Support', d:'Ranked diagnosis suggestions with clinical reasoning' },
+    { i:'📋', t:'Auto SOAP Notes', d:'Notes generated automatically — just review and approve' },
+  ]
+  const patFeats = [
+    { i:'✍️', t:'Describe Your Symptoms', d:'Type how you feel before your appointment' },
+    { i:'🎤', t:'Record a Voice Note', d:'Record yourself and send it directly to your doctor' },
+    { i:'📄', t:'Upload Documents', d:'Send prescriptions and test results securely' },
+  ]
+
+  function setRole(r) {
+    role = r
+    const isDoc = r === 'doctor'
+
+    document.getElementById('bg').className   = isDoc ? 'bg' : 'bg pat'
+    document.getElementById('LP').className   = isDoc ? 'left' : 'left pat'
+    document.getElementById('BI').className   = isDoc ? 'brand-icon' : 'brand-icon pat'
+    document.getElementById('BA').className   = isDoc ? '' : 'pat'
+    document.getElementById('HT').className   = isDoc ? 'htag' : 'htag pat'
+    document.getElementById('HT').textContent = isDoc ? 'Clinical Documentation System' : 'Patient Portal'
+    document.getElementById('AD').style.display = isDoc ? 'inline' : 'none'
+    document.getElementById('AP').style.display = !isDoc ? 'inline' : 'none'
+    document.getElementById('HD').textContent = isDoc
+      ? 'Record consultations, extract patient data automatically, get AI-powered diagnosis suggestions — all from a single conversation. Zero typing required.'
+      : 'Submit your symptoms, record a voice note, and upload documents — all before stepping into the clinic. Your doctor will be fully prepared.'
+
+    document.getElementById('FL').innerHTML = (isDoc ? docFeats : patFeats).map(f =>
+      `<div class="feat ${isDoc?'':'pat'}"><div class="feat-icon">${f.i}</div><div class="feat-text"><strong>${f.t}</strong><span>${f.d}</span></div></div>`
+    ).join('')
+
+    document.getElementById('pill-d').className = isDoc ? 'pill doc' : 'pill'
+    document.getElementById('pill-p').className = !isDoc ? 'pill pat' : 'pill'
+    document.getElementById('RC-d').className   = isDoc ? 'rcard doc' : 'rcard'
+    document.getElementById('RC-p').className   = !isDoc ? 'rcard pat' : 'rcard'
+
+    updateTabs(); showForm(); hideAlert()
+  }
+
+  function switchTab(t) { tab = t; updateTabs(); showForm(); hideAlert() }
+
+  function updateTabs() {
+    const ac = role === 'doctor' ? 'doc' : 'pat'
+    document.getElementById('T-li').className = tab === 'login'  ? `tab ${ac}` : 'tab'
+    document.getElementById('T-su').className = tab === 'signup' ? `tab ${ac}` : 'tab'
+  }
+
+  function showForm() {
+    ['F-dl','F-pl','F-ds','F-ps'].forEach(id => document.getElementById(id).className = 'fs')
+    const key = role === 'doctor'
+      ? (tab === 'login' ? 'F-dl' : 'F-ds')
+      : (tab === 'login' ? 'F-pl' : 'F-ps')
+    document.getElementById(key).className = 'fs on'
+  }
+
+  // ── PASSWORD STRENGTH ─────────────────────────
+  function strength(val, pfx) {
+    ;[1,2,3,4].forEach(i => document.getElementById(`${pfx}-s${i}`).className = 'ss')
+    const lbl = document.getElementById(`${pfx}-sl`)
+    if (!val) { lbl.textContent = ''; return }
+    let sc = 0
+    if (val.length >= 8)  sc++
+    if (val.length >= 12) sc++
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) sc++
+    if (/[^A-Za-z0-9]/.test(val)) sc++
+    const cls = ['w','w','m','s']
+    const lbs = ['Too short','Weak','Medium','Strong 💪']
+    const cls2 = ['#ff6b6b','#ff6b6b','#ffd166','var(--teal)']
+    for (let i = 0; i < sc; i++) document.getElementById(`${pfx}-s${i+1}`).classList.add(cls[sc-1])
+    lbl.textContent = lbs[sc-1] || ''
+    lbl.style.color = cls2[sc-1] || ''
+  }
+
+  // ── HELPERS ───────────────────────────────────
+  const vEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
+
+  function showAlert(msg, type) {
+    const el = document.getElementById('AL')
+    el.className = `alert ${type === 'error' ? 'err' : 'ok'}`
+    document.getElementById('AI').textContent = type === 'error' ? '⚠️' : '✅'
+    document.getElementById('AM').textContent = msg
+  }
+  function hideAlert() { document.getElementById('AL').className = 'alert' }
+
+  // ── DOCTOR SIGNUP STEPS ───────────────────────
+  function dsNext() {
+    const n=v('ds-n'), e=v('ds-e'), p=v('ds-pw'), c=v('ds-cf')
+    if (!n)          return showAlert('Enter your full name','error')
+    if (!vEmail(e))  return showAlert('Enter a valid email','error')
+    if (p.length<8)  return showAlert('Password needs 8+ characters','error')
+    if (p!==c)       return showAlert('Passwords do not match','error')
+    hideAlert()
+    show('ds2'); hide('ds1')
+    mark('dsi1','dn'); mark('dsi2','ad')
+  }
+  function dsPrev() { hideAlert(); show('ds1'); hide('ds2'); mark('dsi1','ad'); mark('dsi2','') }
+
+  // ── PATIENT SIGNUP STEPS ──────────────────────
+  function psNext() {
+    const n=v('ps-n'), e=v('ps-e'), p=v('ps-pw'), c=v('ps-cf')
+    if (!n)          return showAlert('Enter your full name','error')
+    if (!vEmail(e))  return showAlert('Enter a valid email','error')
+    if (p.length<8)  return showAlert('Password needs 8+ characters','error')
+    if (p!==c)       return showAlert('Passwords do not match','error')
+    hideAlert()
+    show('ps2'); hide('ps1')
+    mark('psi1','dn'); mark('psi2','ap')
+  }
+  function psPrev() { hideAlert(); show('ps1'); hide('ps2'); mark('psi1','ap'); mark('psi2','') }
+
+  // ── DOM HELPERS ───────────────────────────────
+  const v    = id => document.getElementById(id).value.trim()
+  const show = id => document.getElementById(id).style.display = 'block'
+  const hide = id => document.getElementById(id).style.display = 'none'
+  function mark(id, cls) {
+    const el = document.getElementById(id)
+    const base = 'stp'
+    el.className = cls ? `${base} ${cls}` : base
+    const num = el.querySelector('.stn')
+    if (cls === 'dn') num.textContent = '✓'
+    else if (cls === 'ad') num.textContent = id.includes('1') ? '1' : id.includes('2') ? '2' : '3'
+    else if (cls === 'ap') num.textContent = id.includes('1') ? '1' : id.includes('2') ? '2' : '3'
+    else num.textContent = id.includes('1') ? '1' : id.includes('2') ? '2' : '3'
+  }
+
+  // ── API CALLS ─────────────────────────────────
+  async function apiCall(url, body) {
+    const res = await fetch(`http://localhost:5000${url}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    })
+    return { ok: res.ok, data: await res.json() }
+  }
+
+  // ── DOCTOR LOGIN ──────────────────────────────
+  async function docLogin() {
+    const email=v('dl-e'), pass=document.getElementById('dl-p').value
+    const btn = document.getElementById('dl-btn')
+    if (!email) return showAlert('Enter your email','error')
+    if (!pass)  return showAlert('Enter your password','error')
+    btn.textContent = 'Signing in...'; btn.disabled = true; hideAlert()
+    try {
+      const {ok,data} = await apiCall('/api/auth/login', {email, password:pass, role:'doctor'})
+      if (!ok) { showAlert(data.error || 'Wrong email or password','error') }
+      else {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('doctor', JSON.stringify(data.doctor))
+        localStorage.setItem('role', 'doctor')
+        showAlert('Login successful! Redirecting...','success')
+        setTimeout(()=> window.location.href='dashboard.html', 1200)
+      }
+    } catch {
+      showAlert('Demo: Redirecting to dashboard...','success')
+      setTimeout(()=> window.location.href='dashboard.html', 1200)
+    }
+    btn.textContent = 'Sign In to Dashboard →'; btn.disabled = false
+  }
+
+  // ── PATIENT LOGIN ─────────────────────────────
+  async function patLogin() {
+    const email=v('pl-e'), pass=document.getElementById('pl-p').value
+    const btn = document.getElementById('pl-btn')
+    if (!email) return showAlert('Enter your email','error')
+    if (!pass)  return showAlert('Enter your password','error')
+    btn.textContent = 'Signing in...'; btn.disabled = true; hideAlert()
+    try {
+      const {ok,data} = await apiCall('/api/auth/login', {email, password:pass, role:'patient'})
+      if (!ok) { showAlert(data.error || 'Wrong email or password','error') }
+      else {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('patient', JSON.stringify(data.patient))
+        localStorage.setItem('role', 'patient')
+        showAlert('Login successful! Opening patient portal...','success')
+        setTimeout(()=> window.location.href='patient-portal.html', 1200)
+      }
+    } catch {
+      showAlert('Demo: Opening patient portal...','success')
+      setTimeout(()=> window.location.href='patient-portal.html', 1200)
+    }
+    btn.textContent = 'Sign In to Patient Portal →'; btn.disabled = false
+  }
+
+  // ── DOCTOR SIGNUP ──────────────────────────────
+  async function docSignup() {
+    const lic=v('ds-lic'), sp=v('ds-sp'), h=v('ds-h'), ph=v('ds-ph')
+    const btn = document.getElementById('ds-btn')
+    if (!lic) return showAlert('Enter your license number','error')
+    if (!sp)  return showAlert('Select your specialization','error')
+    if (!h)   return showAlert('Enter your hospital name','error')
+    if (!ph)  return showAlert('Enter your phone number','error')
+    btn.textContent = 'Creating account...'; btn.disabled = true; hideAlert()
+    const payload = { full_name:v('ds-n'), email:v('ds-e'), password:document.getElementById('ds-pw').value, license_no:lic, specialization:sp, hospital_name:h, phone:ph, role:'doctor' }
+    try {
+      const {ok,data} = await apiCall('/api/auth/signup', payload)
+      if (!ok) { showAlert(data.error || 'Sign up failed','error') }
+      else {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('doctor', JSON.stringify(data.doctor))
+        localStorage.setItem('role', 'doctor')
+        mark('dsi2','dn'); mark('dsi3','ad')
+        showAlert('Account created! Taking you to dashboard...','success')
+        setTimeout(()=> window.location.href='dashboard.html', 1200)
+      }
+    } catch {
+      showAlert('Demo: Taking you to dashboard...','success')
+      setTimeout(()=> window.location.href='dashboard.html', 1200)
+    }
+    btn.textContent = 'Create Account'; btn.disabled = false
+  }
+
+  // ── PATIENT SIGNUP ─────────────────────────────
+  async function patSignup() {
+    const ph=v('ps-ph'), dob=v('ps-dob'), g=v('ps-g')
+    const btn = document.getElementById('ps-btn')
+    if (!ph)  return showAlert('Enter your phone number','error')
+    if (!dob) return showAlert('Enter your date of birth','error')
+    if (!g)   return showAlert('Select your gender','error')
+    btn.textContent = 'Creating account...'; btn.disabled = true; hideAlert()
+    const payload = { full_name:v('ps-n'), email:v('ps-e'), password:document.getElementById('ps-pw').value, phone:ph, dob, gender:g, national_id:v('ps-id'), doctor_name:v('ps-dr'), role:'patient' }
+    try {
+      const {ok,data} = await apiCall('/api/auth/signup', payload)
+      if (!ok) { showAlert(data.error || 'Sign up failed','error') }
+      else {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('patient', JSON.stringify(data.patient))
+        localStorage.setItem('role', 'patient')
+        mark('psi2','dn'); mark('psi3','ap')
+        showAlert('Account created! Opening patient portal...','success')
+        setTimeout(()=> window.location.href='patient-portal.html', 1200)
+      }
+    } catch {
+      showAlert('Demo: Opening patient portal...','success')
+      setTimeout(()=> window.location.href='patient-portal.html', 1200)
+    }
+    btn.textContent = 'Create Account'; btn.disabled = false
+  }
+
+  // ── INIT ──────────────────────────────────────
+  setRole('doctor')
+</script>
+</body>
+</html>
