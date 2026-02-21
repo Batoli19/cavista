@@ -3,4 +3,8 @@ SpeechRecognition
 pyttsx3
 python-docx
 openpyxl
+python-pptx
 pyaudio
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

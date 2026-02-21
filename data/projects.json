@@ -1,5 +1,5 @@
 {
-  "active_project_id": "714d01e2",
+  "active_project_id": "8c78b3f3",
   "projects": [
     {
       "id": "2e8004c1",
@@ -568,6 +568,1486 @@
       "deadline": null,
       "created_at": "2026-02-17",
       "tasks": []
+    },
+    {
+      "id": "282f9cab",
+      "name": "Test Project",
+      "description": "A simple test project",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": []
+    },
+    {
+      "id": "76595804",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute\n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\nSource: https://en.wikipedia.org/wiki/Guardant_Health",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "c6366878",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute\n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\nSource: https://en.wikipedia.org/wiki/Guardant_Health",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "e343de7d",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute\n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\nSource: https://en.wikipedia.org/wiki/Guardant_Health",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "8e5c9002",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute\n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\nSource: https://en.wikipedia.org/wiki/Guardant_Health",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "eec1c21c",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute\n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\nSource: https://en.wikipedia.org/wiki/Guardant_Health",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "c2ac6075",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\nSource: https://en.wikipedia.org/wiki/CareYaya_Health_Technologies\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "5f1a61ec",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute\n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\nSource: https://en.wikipedia.org/wiki/Guardant_Health",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "2c7ba18a",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\nSource: https://en.wikipedia.org/wiki/CareYaya_Health_Technologies\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "b7e5435a",
+      "name": "Health Company With Web Researc Automation Plan",
+      "description": "Web-researched context for: health company with web researc\n1. Misinformation: Misinformation is incorrect or misleading information. Whereas misinformation can exist with or without specific malicious intent, disinformation is deliberately deceptive and intentionally propagated. Misinformation is typically spread unintentionally, mostly caused by a lack of knowledge, an error, or simply a misunderstanding, which contrasts with disinformation. Misinformation can include inaccurate, incomplete, misleading, or false information as well as selective or half-truths. Social media platforms, such as Facebook, Instagram, X, etc., are designed in ways that enable information, including misinformation, to be posted and shared far more quickly than through other communication me\nSource: https://en.wikipedia.org/wiki/Misinformation",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "bc2d8410",
+      "name": "Health Company With Web Research Automation Plan",
+      "description": "Web-researched context for: health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\nSource: https://en.wikipedia.org/wiki/UnitedHealth_Group\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\nSource: https://en.wikipedia.org/wiki/IMS_Health\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\nSource: https://en.wikipedia.org/wiki/CareYaya_Health_Technologies\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \nSource: https://en.wikipedia.org/wiki/Sarah_Cannon_Research_Institute",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "71435be5",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "ddb3f7ba",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "f046bed3",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "e6db094f",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "afecda7e",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "53e50274",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and \n4. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "2a7cff35",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Scope & Requirements",
+          "duration_days": 1,
+          "depends_on": [],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "general",
+          "description": "Define project scope."
+        },
+        {
+          "id": "t2",
+          "name": "UI / Design",
+          "duration_days": 1,
+          "depends_on": [
+            "t1"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "design",
+          "description": "Create mockups."
+        },
+        {
+          "id": "t3",
+          "name": "Core Build (Engine + UI)",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "high",
+          "role": "backend",
+          "description": "Implement core logic."
+        },
+        {
+          "id": "t4",
+          "name": "Integrations (Voice + Actions)",
+          "duration_days": 1,
+          "depends_on": [
+            "t3"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "backend",
+          "description": "Connect voice interaction."
+        },
+        {
+          "id": "t5",
+          "name": "Testing & Demo Prep",
+          "duration_days": 1,
+          "depends_on": [
+            "t4"
+          ],
+          "status": "pending",
+          "delay_days": 0,
+          "priority": "medium",
+          "role": "general",
+          "description": "Prepare for demo."
+        }
+      ]
+    },
+    {
+      "id": "07cb78d9",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Define scope",
+          "description": "Define project scope for Health Company With Web Research Workflow Plan. Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+          "duration_days": 1,
+          "depends_on": [],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t2",
+          "name": "Collect requirements",
+          "description": "Gather requirements and constraints from stakeholders.",
+          "duration_days": 2,
+          "depends_on": [
+            "t1"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t3",
+          "name": "Build implementation plan",
+          "description": "Create phased implementation plan with owners and timelines.",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t4",
+          "name": "Execute pilot",
+          "description": "Run a pilot to validate assumptions.",
+          "duration_days": 3,
+          "depends_on": [
+            "t3"
+          ],
+          "priority": "medium",
+          "role": "general"
+        },
+        {
+          "id": "t5",
+          "name": "Review and scale",
+          "description": "Review pilot outcomes and plan full rollout.",
+          "duration_days": 2,
+          "depends_on": [
+            "t4"
+          ],
+          "priority": "medium",
+          "role": "general"
+        }
+      ]
+    },
+    {
+      "id": "f8bc23e0",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Define scope",
+          "description": "Define project scope for Health Company With Web Research Workflow Plan. Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+          "duration_days": 1,
+          "depends_on": [],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t2",
+          "name": "Collect requirements",
+          "description": "Gather requirements and constraints from stakeholders.",
+          "duration_days": 2,
+          "depends_on": [
+            "t1"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t3",
+          "name": "Build implementation plan",
+          "description": "Create phased implementation plan with owners and timelines.",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t4",
+          "name": "Execute pilot",
+          "description": "Run a pilot to validate assumptions.",
+          "duration_days": 3,
+          "depends_on": [
+            "t3"
+          ],
+          "priority": "medium",
+          "role": "general"
+        },
+        {
+          "id": "t5",
+          "name": "Review and scale",
+          "description": "Review pilot outcomes and plan full rollout.",
+          "duration_days": 2,
+          "depends_on": [
+            "t4"
+          ],
+          "priority": "medium",
+          "role": "general"
+        }
+      ]
+    },
+    {
+      "id": "076f1b39",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Define scope",
+          "description": "Define project scope for Health Company With Web Research Workflow Plan. Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. CareYaya Health Technologies: CareYaya Health Technologies is an American health technology company founded in 2022 by Neal K. Shah and Gavry Eshet. The company operates a digital platform and mobile application that connects patients and medical students as caregivers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+          "duration_days": 1,
+          "depends_on": [],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t2",
+          "name": "Collect requirements",
+          "description": "Gather requirements and constraints from stakeholders.",
+          "duration_days": 2,
+          "depends_on": [
+            "t1"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t3",
+          "name": "Build implementation plan",
+          "description": "Create phased implementation plan with owners and timelines.",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t4",
+          "name": "Execute pilot",
+          "description": "Run a pilot to validate assumptions.",
+          "duration_days": 3,
+          "depends_on": [
+            "t3"
+          ],
+          "priority": "medium",
+          "role": "general"
+        },
+        {
+          "id": "t5",
+          "name": "Review and scale",
+          "description": "Review pilot outcomes and plan full rollout.",
+          "duration_days": 2,
+          "depends_on": [
+            "t4"
+          ],
+          "priority": "medium",
+          "role": "general"
+        }
+      ]
+    },
+    {
+      "id": "8c78b3f3",
+      "name": "Health Company With Web Research Workflow Plan",
+      "description": "Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+      "deadline": null,
+      "created_at": "2026-02-20",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Define scope",
+          "description": "Define project scope for Health Company With Web Research Workflow Plan. Context for health company with web research\n1. UnitedHealth Group: UnitedHealth Group Incorporated is an American multinational for-profit company specializing in health insurance and health care services based in Eden Prairie, Minnesota. Selling insurance products under UnitedHealthcare, and health care services under the Optum brand, it is the world's seventh-largest company by revenue and the largest health care company by revenue. The company is ranked seventh on the 2025 Fortune Global 500. UnitedHealth Group had a market capitalization of more than $300 billion as of year-end 2025. The company is the largest health insurer in the United States, insuring over 50 million people, and operates globally. UnitedHealth Group has faced numerous investigations\n2. IMS Health: IMS Health was an American company that provided information, services and technology for the healthcare industry. IMS stood for Intercontinental Medical Statistics. It was the largest vendor of U.S. physician prescribing data. IMS Health was founded in 1954 by Bill Frohlich and David Dubow with Arthur Sackler having a hidden ownership stake. In 2010, IMS Health was taken private by TPG Capital, CPP Investment Board and Leonard Green & Partners. The company went public on April 4, 2014, and began trading on the NYSE under the symbol IMS. IMS Health was headquartered in Danbury, Connecticut. Over 2016 Quintiles and IMS Health merged, and the resulting company was named QuintilesIMS, which was\n3. Guardant Health: Guardant Health, Inc. is an American biotechnology company based in Palo Alto, California. Co-founders Helmy Eltoukhy and AmirAli Talasaz serve as co-chief executive officers.\n4. Sarah Cannon Research Institute: Sarah Cannon Research Institute (SCRI) is a research organization focusing on therapies for patients which include drugs that are in development. With corporate headquarters in Nashville, Tennessee, United States, it conducts community-based clinical trials in oncology, cardiology, gastroenterology, and other therapeutic areas. The current CEO is Dee Anna Smith. SCRI accrued more than 2,500 patients to cancer trials in 2009, including more than 500 to Phase I investigational studies. Non-oncology trials accounted for nearly 1,500 additional patients for a total of almost 4,000. Its drug development program has conducted 400+ \"first-in-human\" trials. SCRI has been involved in the testing and ",
+          "duration_days": 1,
+          "depends_on": [],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t2",
+          "name": "Collect requirements",
+          "description": "Gather requirements and constraints from stakeholders.",
+          "duration_days": 2,
+          "depends_on": [
+            "t1"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t3",
+          "name": "Build implementation plan",
+          "description": "Create phased implementation plan with owners and timelines.",
+          "duration_days": 2,
+          "depends_on": [
+            "t2"
+          ],
+          "priority": "high",
+          "role": "general"
+        },
+        {
+          "id": "t4",
+          "name": "Execute pilot",
+          "description": "Run a pilot to validate assumptions.",
+          "duration_days": 3,
+          "depends_on": [
+            "t3"
+          ],
+          "priority": "medium",
+          "role": "general"
+        },
+        {
+          "id": "t5",
+          "name": "Review and scale",
+          "description": "Review pilot outcomes and plan full rollout.",
+          "duration_days": 2,
+          "depends_on": [
+            "t4"
+          ],
+          "priority": "medium",
+          "role": "general"
+        }
+      ]
     }
   ]
 }

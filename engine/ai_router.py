@@ -1,102 +1,101 @@
 """
-AI Router — Smart routing between Groq and Gemini
-==================================================
-- Default: Groq (fast, unlimited)
-- Vision: Gemini (when images present)
-- Planning/Heavy: Optional Gemini for complex tasks
+AI Router: resilient routing across model providers.
 """
 
-import os
-from typing import Optional
+from __future__ import annotations
 
-# Import the chat function
-try:
-    from engine.ai_chat import chat_with_ai, _chat_with_groq, _chat_with_gemini_text
-except ImportError:
-    # Fallback if running standalone
-    def chat_with_ai(msg, files=None): 
-        return "AI router not properly configured"
-    def _chat_with_groq(msg): 
-        return "Groq not available"
-    def _chat_with_gemini_text(msg): 
-        return "Gemini not available"
+import time
+from typing import Dict
+
+from engine.ai_chat import chat_with_ai, _chat_with_gemini_text, _chat_with_groq
+
+CACHE_TTL_SECONDS = 300
+_ROUTER_CACHE: Dict[str, tuple[float, str]] = {}
+
+
+def _cache_get(key: str) -> str | None:
+    item = _ROUTER_CACHE.get(key)
+    if not item:
+        return None
+    expires_at, value = item
+    if expires_at < time.time():
+        _ROUTER_CACHE.pop(key, None)
+        return None
+    return value
+
+
+def _cache_set(key: str, value: str) -> None:
+    _ROUTER_CACHE[key] = (time.time() + CACHE_TTL_SECONDS, value)
+
+
+def _local_fallback(prompt: str) -> str:
+    short = (prompt or "").strip()
+    if len(short) > 120:
+        short = short[:120] + "..."
+    return (
+        "I could not reach the main models right now.\n"
+        f"- Request captured: {short or 'No text provided'}\n"
+        "- Please try again shortly."
+    )
 
 
 def route_request(
-    prompt: str, 
+    prompt: str,
     context: str = None,
     task_type: str = "fast",
-    files: list = None
+    files: list = None,
 ) -> str:
     """
-    Smart AI routing with context awareness.
-    
-    Args:
-        prompt: The user's question/command
-        context: Optional RAG context from knowledge base
-        task_type: "fast" (default, Groq) | "vision" (Gemini) | "planning" (Gemini)
-        files: Optional file attachments
-    
-    Returns:
-        AI response string
+    Routing policy:
+    - vision/files => chat_with_ai (vision pipeline)
+    - planning/reasoning => Gemini text then Groq
+    - fast/default => Groq then Gemini text
+    - final fallback => local short response
     """
     files = files or []
-    
-    # Append context if provided (RAG/knowledge base)
-    if context:
-        full_prompt = f"{context}\n\nUser Question: {prompt}"
-    else:
-        full_prompt = prompt
-    
-    # ── VISION: Force Gemini ─────────────────────────────────────────────
-    if task_type == "vision" or files:
-        print("[AI Router] Vision task → Gemini")
-        return chat_with_ai(full_prompt, files)
-    
-    # ── PLANNING: Use Gemini for complex planning ────────────────────────
-    if task_type == "planning":
-        print("[AI Router] Planning task → Gemini (structured output)")
-        # Gemini has better JSON mode for structured planning
+    full_prompt = f"{context}\n\nUser Question: {prompt}" if context else prompt
+    cache_key = f"{task_type}|{bool(files)}|{full_prompt}"
+    cached = _cache_get(cache_key)
+    if cached:
+        return cached
+
+    try:
+        if task_type == "vision" or files:
+            result = chat_with_ai(full_prompt, files)
+            _cache_set(cache_key, result)
+            return result
+
+        if task_type in ("planning", "reasoning"):
+            try:
+                result = _chat_with_gemini_text(full_prompt)
+                _cache_set(cache_key, result)
+                return result
+            except Exception:
+                result = _chat_with_groq(full_prompt)
+                _cache_set(cache_key, result)
+                return result
+
         try:
-            return _chat_with_gemini_text(full_prompt)
-        except Exception as e:
-            print(f"[AI Router] Gemini planning failed: {e}, falling back to Groq")
-            return _chat_with_groq(full_prompt)
-    
-    # ── FAST (DEFAULT): Use Groq ─────────────────────────────────────────
-    print("[AI Router] Fast task → Groq")
-    return chat_with_ai(full_prompt, files=[])  # No files = Groq path
+            result = _chat_with_groq(full_prompt)
+            _cache_set(cache_key, result)
+            return result
+        except Exception:
+            result = _chat_with_gemini_text(full_prompt)
+            _cache_set(cache_key, result)
+            return result
+    except Exception:
+        result = _local_fallback(full_prompt)
+        _cache_set(cache_key, result)
+        return result
 
-
-# ── Convenience functions ─────────────────────────────────────────────────────
 
 def ask_fast(prompt: str, context: str = None) -> str:
-    """Quick questions — uses Groq (instant)."""
     return route_request(prompt, context=context, task_type="fast")
 
 
 def ask_vision(prompt: str, files: list) -> str:
-    """Image analysis — uses Gemini vision."""
     return route_request(prompt, task_type="vision", files=files)
 
 
 def ask_planner(prompt: str) -> str:
-    """Complex planning — uses Gemini for structured output."""
     return route_request(prompt, task_type="planning")
-
-
-# ── Example usage ─────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    # Test fast routing
-    print("\n=== Fast Question (Groq) ===")
-    print(ask_fast("What's 2+2?"))
-    
-    # Test with context
-    print("\n=== Question with Context (Groq) ===")
-    ctx = "Project deadline: March 1st. Team size: 3 developers."
-    print(ask_fast("When is the deadline?", context=ctx))
-    
-    # Test planning
-    print("\n=== Planning Task (Gemini) ===")
-    print(ask_planner("Create a 5-task plan for building a website"))

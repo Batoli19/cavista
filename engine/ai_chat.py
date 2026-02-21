@@ -19,8 +19,72 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 # Models
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash-exp")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+CACHE_TTL_SECONDS = 300
+_TEXT_CACHE: Dict[str, tuple[float, str]] = {}
+_GEMINI_MODEL_CANDIDATES = [GEMINI_MODEL, "gemini-1.5-flash", "gemini-1.5-flash-8b"]
+
+STYLE_RULES = (
+    "You are a concise assistant.\n"
+    "Style rules:\n"
+    "- No roleplay.\n"
+    "- No unexplained acronyms.\n"
+    "- Do not say phrases like 'pleasure to meet you'.\n"
+    "- Default format: 1 sentence, then up to 3 bullets, then either 1 question OR 2-3 choices.\n"
+    "- Ask clarifying questions only if required, and at most 2.\n"
+    "- Keep tone natural and direct.\n"
+)
+
+
+def _cache_get(key: str) -> str | None:
+    hit = _TEXT_CACHE.get(key)
+    if not hit:
+        return None
+    exp, value = hit
+    if exp < time.time():
+        _TEXT_CACHE.pop(key, None)
+        return None
+    return value
+
+
+def _cache_set(key: str, value: str) -> None:
+    _TEXT_CACHE[key] = (time.time() + CACHE_TTL_SECONDS, value)
+
+
+def _local_fallback_response(message: str) -> str:
+    preview = (message or "").strip()
+    if len(preview) > 120:
+        preview = preview[:120] + "..."
+    return (
+        "I could not reach the main models right now.\n"
+        f"- Request captured: {preview or 'No text provided'}\n"
+        "- Try again in a moment, or ask for a shorter response.\n"
+        "Would you like a quick outline instead?"
+    )
+
+
+def _with_retry(call_fn):
+    delay = 0.8
+    last_err = None
+    for _ in range(3):
+        try:
+            return call_fn()
+        except urllib.error.HTTPError as e:
+            last_err = e
+            if e.code == 403:
+                raise
+            if e.code == 429:
+                time.sleep(delay)
+                delay *= 2
+                continue
+            raise
+        except Exception as e:
+            last_err = e
+            time.sleep(delay)
+            delay *= 2
+    if last_err:
+        raise last_err
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -95,14 +159,19 @@ def chat_with_ai(message: str, files: List[Dict[str, Any]] = None) -> str:
         return "I'm listening..."
 
     files = files or []
+    cache_key = f"text::{message.strip()}" if message and not files else ""
+    if cache_key:
+        cached = _cache_get(cache_key)
+        if cached:
+            return cached
 
     # ── VISION PATH: Images detected → use Gemini ────────────────────────
     if _has_images(files):
-        print("[AI Chat] 🖼️  Images detected → routing to Gemini vision")
+        print("[AI Chat] Images detected -> routing to Gemini vision")
         return _chat_with_gemini_vision(message, files)
 
     # ── TEXT PATH: Default to Groq (FAST) ────────────────────────────────
-    print("[AI Chat] 💬 Text only → routing to Groq (fast)")
+    print("[AI Chat] Text only -> routing to Groq (fast)")
     
     # Extract text from non-image files and append to message
     if files:
@@ -122,21 +191,36 @@ def chat_with_ai(message: str, files: List[Dict[str, Any]] = None) -> str:
     # Try Groq first
     if GROQ_API_KEY:
         try:
-            return _chat_with_groq(message)
+            out = _chat_with_groq(message)
+            if cache_key:
+                _cache_set(cache_key, out)
+            return out
         except Exception as e:
             print(f"[AI Chat] Groq failed: {e}")
             # Fallback to Gemini if Groq fails
             if GEMINI_API_KEY:
                 print("[AI Chat] Falling back to Gemini (text only)")
-                return _chat_with_gemini_text(message)
-            return f"AI error: {e}"
+                try:
+                    out = _chat_with_gemini_text(message)
+                    if cache_key:
+                        _cache_set(cache_key, out)
+                    return out
+                except Exception:
+                    pass
+            return _local_fallback_response(message)
     
     # No Groq key? Try Gemini
     if GEMINI_API_KEY:
         print("[AI Chat] No Groq key, using Gemini (text only)")
-        return _chat_with_gemini_text(message)
+        try:
+            out = _chat_with_gemini_text(message)
+            if cache_key:
+                _cache_set(cache_key, out)
+            return out
+        except Exception:
+            return _local_fallback_response(message)
     
-    return "No AI configured. Please set GROQ_API_KEY or GEMINI_API_KEY."
+    return _local_fallback_response(message)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -153,7 +237,7 @@ def _chat_with_groq(message: str) -> str:
     payload = {
         "model": GROQ_MODEL,
         "messages": [
-            {"role": "system", "content": "You are JARVIS, a helpful and witty AI assistant."},
+            {"role": "system", "content": STYLE_RULES},
             {"role": "user", "content": message}
         ],
         "temperature": 0.7,
@@ -172,12 +256,14 @@ def _chat_with_groq(message: str) -> str:
         }
     )
     
-    try:
+    def _call():
         with urllib.request.urlopen(req, timeout=15) as response:
             resp_body = response.read().decode("utf-8")
             resp_data = json.loads(resp_body)
             return resp_data["choices"][0]["message"]["content"].strip()
-            
+
+    try:
+        return _with_retry(_call)
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
         raise Exception(f"Groq HTTP {e.code}: {error_body}")
@@ -198,11 +284,9 @@ def _chat_with_gemini_vision(message: str, files: List[Dict[str, Any]]) -> str:
         return "Vision unavailable (no GEMINI_API_KEY). Please add images via upload."
 
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-
         parts = []
         if message:
-            parts.append({"text": message})
+            parts.append({"text": f"{STYLE_RULES}\nUser request:\n{message}"})
 
         # Add files
         for file in files:
@@ -227,19 +311,24 @@ def _chat_with_gemini_vision(message: str, files: List[Dict[str, Any]]) -> str:
         payload = {"contents": [{"parts": parts}]}
         data_json = json.dumps(payload).encode("utf-8")
 
-        req = urllib.request.Request(
-            url, 
-            data=data_json, 
-            headers={"Content-Type": "application/json"}
-        )
-
-        with urllib.request.urlopen(req, timeout=20) as response:
-            resp_body = response.read().decode("utf-8")
-            resp_data = json.loads(resp_body)
+        last_error = None
+        for model in _GEMINI_MODEL_CANDIDATES:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+            req = urllib.request.Request(url, data=data_json, headers={"Content-Type": "application/json"})
             try:
-                return resp_data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            except (KeyError, IndexError):
-                return "Gemini processed the request but returned no text."
+                def _call():
+                    with urllib.request.urlopen(req, timeout=20) as response:
+                        resp_body = response.read().decode("utf-8")
+                        return json.loads(resp_body)
+                resp_data = _with_retry(_call)
+                try:
+                    return resp_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                except (KeyError, IndexError):
+                    return "Vision request completed but returned no text."
+            except Exception as e:
+                last_error = e
+                continue
+        raise last_error if last_error else Exception("Gemini vision unavailable")
 
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8') if e.fp else str(e)
@@ -270,26 +359,27 @@ def _chat_with_gemini_text(message: str) -> str:
         return "AI unavailable (no API keys configured)."
 
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-
-        payload = {
-            "contents": [{"parts": [{"text": message}]}]
-        }
-        
+        payload = {"contents": [{"parts": [{"text": f"{STYLE_RULES}\nUser request:\n{message}"}]}]}
         data_json = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            url, 
-            data=data_json, 
-            headers={"Content-Type": "application/json"}
-        )
 
-        with urllib.request.urlopen(req, timeout=15) as response:
-            resp_body = response.read().decode("utf-8")
-            resp_data = json.loads(resp_body)
+        last_error = None
+        for model in _GEMINI_MODEL_CANDIDATES:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
+            req = urllib.request.Request(url, data=data_json, headers={"Content-Type": "application/json"})
             try:
-                return resp_data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            except (KeyError, IndexError):
-                return "Gemini returned no response."
+                def _call():
+                    with urllib.request.urlopen(req, timeout=15) as response:
+                        resp_body = response.read().decode("utf-8")
+                        return json.loads(resp_body)
+                resp_data = _with_retry(_call)
+                try:
+                    return resp_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                except (KeyError, IndexError):
+                    return "Gemini returned no response."
+            except Exception as e:
+                last_error = e
+                continue
+        raise last_error if last_error else Exception("Gemini unavailable")
 
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8') if e.fp else str(e)

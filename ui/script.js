@@ -26,6 +26,38 @@ const quickActionCards = document.querySelectorAll('.quick-action-card');
 let isRecording = false;
 let recognition = null;
 let attachedFiles = [];
+let setupBannerEl = null;
+
+function ensureSetupBanner() {
+    if (setupBannerEl) return setupBannerEl;
+    setupBannerEl = document.createElement('div');
+    setupBannerEl.id = 'setupBanner';
+    setupBannerEl.style.cssText = 'display:none; margin: 10px 0 14px 0; padding: 10px 12px; border-radius: 10px; background: #fff4e5; color: #5d3b00; font-size: 0.88rem;';
+    const parent = messagesArea && messagesArea.parentElement ? messagesArea.parentElement : document.body;
+    parent.insertBefore(setupBannerEl, messagesArea || parent.firstChild);
+    return setupBannerEl;
+}
+
+async function checkHealth() {
+    try {
+        const resp = await fetch('/api/health');
+        const data = await resp.json();
+        const deps = data.installed_export_deps || {};
+        const missing = [];
+        if (!deps.python_docx) missing.push('python-docx');
+        if (!deps.python_pptx) missing.push('python-pptx');
+        if (!deps.openpyxl) missing.push('openpyxl');
+        const banner = ensureSetupBanner();
+        if (missing.length === 0) {
+            banner.style.display = 'none';
+            return;
+        }
+        banner.style.display = 'block';
+        banner.innerHTML = `Setup: missing export dependencies (${missing.join(', ')}). Run <code>pip install python-docx python-pptx openpyxl</code>`;
+    } catch (e) {
+        // Silent fail: health banner is optional.
+    }
+}
 
 // Auto-resize textarea
 messageInput.addEventListener('input', function () {
@@ -79,6 +111,10 @@ async function sendMessage() {
     toggleSendButton();
     scrollToBottom();
 
+    const typingIndicator = createTypingIndicator();
+    messagesArea.appendChild(typingIndicator);
+    scrollToBottom();
+
     // Call Python Backend
     try {
         const response = await fetch('/api/command', {
@@ -90,16 +126,28 @@ async function sendMessage() {
             })
         });
         const data = await response.json();
-        const aiResponse = data.reply;
+        const aiResponse = data.show_text || data.reply || '';
+        const aiSpeakText = data.say_text || aiResponse;
+        const aiEvidence = Array.isArray(data.evidence) ? data.evidence : [];
+        const aiActions = Array.isArray(data.actions) ? data.actions : [];
+        const aiFiles = Array.isArray(data.files) ? data.files : [];
+        const aiMeta = data.meta || {};
 
-        const aiMessageDiv = createAIMessage(aiResponse);
+        typingIndicator.remove();
+
+        const aiMessageDiv = createAIMessage('', aiEvidence, aiActions, aiMeta, aiFiles);
         messagesArea.appendChild(aiMessageDiv);
+        const textEl = aiMessageDiv.querySelector('.ai-text');
+        await simulateStreamingText(textEl, aiResponse);
         scrollToBottom();
 
         // Speak response
-        speak(aiResponse);
+        speak(aiSpeakText);
 
     } catch (err) {
+        if (typingIndicator && typingIndicator.parentNode) {
+            typingIndicator.remove();
+        }
         console.error(err);
         const errorDiv = createAIMessage("Error: Could not connect to Jarvis backend. Is server.py running?");
         messagesArea.appendChild(errorDiv);
@@ -157,7 +205,7 @@ function createUserMessage(text, files) {
     return messageDiv;
 }
 
-function createAIMessage(text) {
+function createAIMessage(text, evidence = [], actions = [], meta = {}, files = []) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ai-message';
 
@@ -175,14 +223,307 @@ function createAIMessage(text) {
     const content = document.createElement('div');
     content.className = 'message-content';
 
-    const textP = document.createElement('p');
-    textP.textContent = text;
+    const textP = document.createElement('div');
+    textP.className = 'ai-text';
+    textP.style.marginBottom = '10px';
+    textP.innerHTML = renderSimpleMarkdown(text);
     content.appendChild(textP);
+
+    if (evidence.length > 0) {
+        const evidenceDiv = renderEvidence(evidence);
+        content.appendChild(evidenceDiv);
+    }
+
+    if (files.length > 0) {
+        const filesDiv = renderFiles(files);
+        content.appendChild(filesDiv);
+    }
+
+    if (actions.length > 0) {
+        const actionDiv = renderActions(actions);
+        content.appendChild(actionDiv);
+    }
+
+    const detailsDiv = renderDetails(meta);
+    if (detailsDiv) {
+        content.appendChild(detailsDiv);
+    }
 
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
 
     return messageDiv;
+}
+
+function renderSimpleMarkdown(text) {
+    const escaped = (text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const linked = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    const bolded = linked.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return bolded.replace(/\n/g, '<br>');
+}
+
+function createTypingIndicator() {
+    const wrap = document.createElement('div');
+    wrap.className = 'message ai-message';
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = 'AI';
+
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.innerHTML = '<p>Thinking<span class="typing-dots">...</span></p>';
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(content);
+    return wrap;
+}
+
+async function simulateStreamingText(targetEl, fullText) {
+    if (!targetEl) return;
+    const text = fullText || '';
+    if (text.length < 40) {
+        targetEl.innerHTML = renderSimpleMarkdown(text);
+        return;
+    }
+    let current = '';
+    for (let i = 0; i < text.length; i++) {
+        current += text[i];
+        if (i % 4 === 0 || i === text.length - 1) {
+            targetEl.innerHTML = renderSimpleMarkdown(current);
+            await new Promise(resolve => setTimeout(resolve, 8));
+        }
+    }
+}
+
+function attachmentDataUrl(item) {
+    if (!item) return '';
+    if (item.data) {
+        const mime = item.mime_type || item.type || 'image/png';
+        return `data:${mime};base64,${item.data}`;
+    }
+    if (item.url) return item.url;
+    if (item.path) return item.path;
+    if (item.attachment) {
+        const type = item.attachment.type || 'application/octet-stream';
+        const content = item.attachment.content || '';
+        if (content) return `data:${type};base64,${content}`;
+    }
+    return '';
+}
+
+function renderEvidence(evidence) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'margin-top: 14px; display: grid; gap: 12px;';
+
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:0.85rem; opacity:.8; font-weight:600;';
+    label.textContent = `Evidence (${evidence.length})`;
+    wrap.appendChild(label);
+
+    const sources = evidence.filter(e => (e.type || '').toLowerCase() === 'link');
+    const visuals = evidence.filter(e => (e.type || '').toLowerCase() !== 'link');
+
+    if (sources.length > 0) {
+        const sourceSection = document.createElement('details');
+        sourceSection.style.cssText = 'background: rgba(0,0,0,0.03); border-radius: 8px; padding: 8px 10px;';
+
+        const sourceSummary = document.createElement('summary');
+        sourceSummary.style.cssText = 'cursor: pointer; font-weight:600;';
+        sourceSummary.textContent = `Sources (${sources.length})`;
+        sourceSection.appendChild(sourceSummary);
+
+        const sourceList = document.createElement('div');
+        sourceList.style.cssText = 'display:grid; gap:8px; margin-top:8px;';
+        sourceSection.appendChild(sourceList);
+
+        sources.forEach(item => {
+            const card = document.createElement('a');
+            card.href = item.url || '#';
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.style.cssText = 'display:block; text-decoration:none; background: rgba(0,0,0,0.06); border-radius:8px; padding:10px 12px; color: inherit;';
+            const title = document.createElement('div');
+            title.textContent = item.title || 'Research Source';
+            title.style.cssText = 'font-weight: 600;';
+            card.appendChild(title);
+            if (item.source || item.caption) {
+                const meta = document.createElement('div');
+                meta.style.cssText = 'font-size: 0.8rem; opacity: .8; margin-top: 2px;';
+                const parts = [];
+                if (item.source) parts.push(item.source);
+                if (item.caption) parts.push(item.caption);
+                meta.textContent = parts.join(' - ');
+                card.appendChild(meta);
+            }
+            sourceList.appendChild(card);
+        });
+
+        wrap.appendChild(sourceSection);
+    }
+
+    visuals.forEach(item => {
+        const type = (item.type || '').toLowerCase();
+
+        if (type === 'image_pair') {
+            const card = document.createElement('div');
+            card.style.cssText = 'background: rgba(0,0,0,0.04); border-radius: 10px; padding: 10px;';
+
+            const title = document.createElement('div');
+            title.style.cssText = 'font-size:0.85rem; margin-bottom:8px; opacity:0.85;';
+            title.textContent = item.title || 'Before / After Proof';
+            card.appendChild(title);
+
+            const row = document.createElement('div');
+            row.style.cssText = 'display:grid; grid-template-columns: 1fr 1fr; gap: 10px;';
+
+            const before = document.createElement('img');
+            before.src = attachmentDataUrl(item.before);
+            before.alt = 'Before';
+            before.style.cssText = 'width:100%; border-radius:8px;';
+
+            const after = document.createElement('img');
+            after.src = attachmentDataUrl(item.after);
+            after.alt = 'After';
+            after.style.cssText = 'width:100%; border-radius:8px;';
+
+            row.appendChild(before);
+            row.appendChild(after);
+            card.appendChild(row);
+            wrap.appendChild(card);
+            return;
+        }
+
+        if (type === 'image') {
+            const card = document.createElement('div');
+            card.style.cssText = 'background: rgba(0,0,0,0.04); border-radius: 10px; padding: 10px;';
+
+            if (item.title) {
+                const title = document.createElement('div');
+                title.style.cssText = 'font-size:0.85rem; margin-bottom:8px; opacity:0.85;';
+                title.textContent = item.title;
+                card.appendChild(title);
+            }
+
+            const img = document.createElement('img');
+            img.src = attachmentDataUrl(item);
+            img.alt = item.title || 'Evidence image';
+            img.style.cssText = 'max-width: 320px; width:100%; border-radius: 8px; display:block;';
+            card.appendChild(img);
+
+            if (item.caption) {
+                const caption = document.createElement('div');
+                caption.style.cssText = 'font-size:0.8rem; margin-top:6px; opacity:.85;';
+                caption.textContent = item.caption;
+                card.appendChild(caption);
+            }
+            wrap.appendChild(card);
+        }
+    });
+
+    return wrap;
+}
+
+function renderDetails(meta) {
+    if (!meta || Object.keys(meta).length === 0) return null;
+    const details = document.createElement('details');
+    details.style.cssText = 'margin-top: 10px; background: rgba(0,0,0,0.03); border-radius: 8px; padding: 8px 10px;';
+
+    const summary = document.createElement('summary');
+    summary.style.cssText = 'cursor:pointer; font-size: 0.85rem; font-weight:600;';
+    summary.textContent = 'Details';
+    details.appendChild(summary);
+
+    const body = document.createElement('div');
+    body.style.cssText = 'margin-top:8px; font-size: 0.8rem; opacity:.85;';
+    const intent = meta.intent ? `Intent: ${meta.intent}` : '';
+    const verbosity = meta.verbosity ? `Verbosity: ${meta.verbosity}` : '';
+    body.textContent = [intent, verbosity].filter(Boolean).join(' | ');
+    details.appendChild(body);
+    return details;
+}
+
+function renderActions(actions) {
+    const box = document.createElement('div');
+    box.style.cssText = 'margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;';
+
+    actions.slice(0, 3).forEach(action => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'quick-action-card';
+        btn.style.cssText = 'padding: 8px 10px; border-radius: 8px; border: none; cursor: pointer;';
+        btn.textContent = action.label || 'Run';
+        btn.addEventListener('click', () => {
+            messageInput.value = action.command || '';
+            messageInput.dispatchEvent(new Event('input'));
+            messageInput.focus();
+        });
+        box.appendChild(btn);
+    });
+
+    return box;
+}
+
+function fileIconByType(type) {
+    const t = (type || '').toLowerCase();
+    if (t === 'docx') return 'DOCX';
+    if (t === 'pptx') return 'PPTX';
+    if (t === 'xlsx') return 'XLSX';
+    if (t === 'pdf') return 'PDF';
+    return 'FILE';
+}
+
+function renderFiles(files) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'margin-top: 12px; display: grid; gap: 10px;';
+
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:0.85rem; opacity:.8; font-weight:600;';
+    title.textContent = `Downloads (${files.length})`;
+    wrap.appendChild(title);
+
+    files.forEach(file => {
+        const card = document.createElement('div');
+        card.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:10px; background: rgba(0,0,0,0.04); border-radius: 10px; padding: 10px 12px;';
+
+        const left = document.createElement('div');
+        left.style.cssText = 'display:flex; align-items:center; gap:10px; min-width: 0;';
+
+        const icon = document.createElement('div');
+        icon.style.cssText = 'font-size:0.75rem; font-weight:700; background:#111; color:#fff; border-radius:6px; padding:4px 6px;';
+        icon.textContent = fileIconByType(file.type);
+
+        const info = document.createElement('div');
+        info.style.cssText = 'min-width:0;';
+
+        const name = document.createElement('div');
+        name.style.cssText = 'font-size:0.9rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:260px;';
+        name.textContent = file.name || 'download';
+
+        const meta = document.createElement('div');
+        meta.style.cssText = 'font-size:0.78rem; opacity:.75;';
+        const sizeKb = file.size ? `${Math.max(1, Math.round(file.size / 1024))} KB` : '';
+        meta.textContent = [String(file.type || '').toUpperCase(), sizeKb].filter(Boolean).join(' • ');
+
+        info.appendChild(name);
+        info.appendChild(meta);
+        left.appendChild(icon);
+        left.appendChild(info);
+
+        const btn = document.createElement('a');
+        btn.href = file.url || '#';
+        btn.textContent = 'Download';
+        btn.style.cssText = 'text-decoration:none; font-size:0.82rem; font-weight:600; padding:6px 10px; border-radius:6px; background:#111; color:#fff;';
+
+        card.appendChild(left);
+        card.appendChild(btn);
+        wrap.appendChild(card);
+    });
+
+    return wrap;
 }
 
 function generateMockAIResponse(userMessage) {
@@ -477,8 +818,8 @@ document.querySelectorAll('.rp-btn').forEach(btn => {
 
 // Update connection status in right panel
 function updateRightPanelStatus(isOnline) {
-    const connDot = document.getElementById('connDot');
-    const connText = document.getElementById('connText');
+    const connDot = document.getElementById('connectionDot');
+    const connText = document.getElementById('statusText');
     if (connDot && connText) {
         if (isOnline) {
             connDot.classList.remove('offline');
@@ -492,12 +833,18 @@ function updateRightPanelStatus(isOnline) {
     }
 }
 
-// Hook into existing setConnected function
-const originalSetConnected = setConnected;
-setConnected = function (isOnline) {
-    originalSetConnected(isOnline); // Call original
-    updateRightPanelStatus(isOnline); // Update right panel
-};
+// Hook into existing setConnected function when available
+if (typeof window.setConnected === 'function') {
+    const originalSetConnected = window.setConnected;
+    window.setConnected = function (isOnline) {
+        originalSetConnected(isOnline);
+        updateRightPanelStatus(isOnline);
+    };
+} else {
+    // Safe default for index.html where setConnected may not be defined.
+    updateRightPanelStatus(true);
+}
 
 console.log('ProjectForge initialized successfully! Ready for Python backend integration.');
+checkHealth();
 

@@ -3,7 +3,8 @@ from datetime import date, timedelta
 from typing import Dict, Any, List, Tuple
 
 from .storage import load_data, save_data
-
+from .ai_planner import generate_plan_ai
+from .analytics import diagnose_project
 
 def _today_iso() -> str:
     return date.today().isoformat()
@@ -23,6 +24,11 @@ def create_project(name: str, deadline_iso: str | None = None, description: str 
     data.setdefault("projects", []).append(project)
     data["active_project_id"] = pid
     save_data(data)
+    
+    # Index new project for RAG
+    # (In a real app, we'd do this async)
+    # index_project(project) 
+    
     return project
 
 
@@ -136,3 +142,10 @@ def get_status(project: Dict[str, Any]) -> Dict[str, Any]:
         return {"status": "on-track", "message": f"On track. Estimated finish {final_end} before deadline {deadline}.", "schedule": schedule}
 
     return {"status": "off-track", "message": f"Off track. Estimated finish {final_end} after deadline {deadline}.", "schedule": schedule}
+
+def get_project_diagnosis(project_id: str) -> List[str]:
+    data = load_data()
+    for p in data.get("projects", []):
+        if p.get("id") == project_id:
+            return diagnose_project(p)
+    return ["Project not found."]
